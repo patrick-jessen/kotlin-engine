@@ -1,7 +1,6 @@
 package org.patrick.game
 
 import org.lwjgl.opengl.GL11.*
-import org.patrick.game.gltf.*
 import glm_.*
 import glm_.mat4x4.Mat4
 
@@ -14,7 +13,7 @@ var shader = Shader()
 fun setup() {
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
 
-    model = loadModel("./assets/BoxTextured.gltf")
+    model = loadModel("./assets/monkey.gltf")
     shader.load(vertSrc, fragSrc)
 
     val projMat = glm.perspective(glm.PIf / 2, 800f / 600f, 0.1f, 100f)

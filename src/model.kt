@@ -1,24 +1,21 @@
-package org.patrick.game.gltf
+package org.patrick.game
 
 import com.beust.klaxon.Klaxon
 import org.lwjgl.BufferUtils
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30.*
 import java.io.File
-import java.nio.ByteBuffer
 import java.util.*
 
-data class GLTFScene(val nodes: List<Int>)
-data class GLTFNode(
+private data class GLTFScene(val nodes: List<Int>)
+private data class GLTFNode(
     val children: List<Int> = listOf(),
     val matrix: List<Float> = listOf(), // TODO: Identity matrix
     val mesh: Int = -1
 )
-data class GLTFMesh(val primitives: List<GLTFMeshPrimitive>)
-data class GLTFMeshPrimitive(
+private data class GLTFMesh(val primitives: List<GLTFMeshPrimitive>)
+private data class GLTFMeshPrimitive(
     val attributes: Map<String, Int>,
-    val indices: Int,
-    val mode: Int
+    val indices: Int
 ) {
     fun createAttribute(gltf: GLTF, name:String, attribIdx:Int): Int {
         val accessor = gltf.accessors[attributes[name]!!]
@@ -42,7 +39,6 @@ data class GLTFMeshPrimitive(
         glBindBuffer(GL_ARRAY_BUFFER, 0)
         return buf.handle
     }
-
     fun create(gltf: GLTF):Mesh {
         val handle = glGenVertexArrays()
         glBindVertexArray(handle)
@@ -61,33 +57,25 @@ data class GLTFMeshPrimitive(
         return Mesh(handle, accessor.count, accessor.componentType, bufView.byteOffset+accessor.byteOffset)
     }
 }
-
-class Mesh(val va:Int, val numIdices:Int, val compType:Int, val offset:Long) {
-    fun draw() {
-        glBindVertexArray(va)
-        glDrawElements(GL_TRIANGLES, numIdices, compType, offset)
-    }
-}
-
-data class GLTFAccessor(
+private data class GLTFAccessor(
     val bufferView: Int,
-    val byteOffset: Long,
+    val byteOffset: Long = 0,
     val componentType: Int,
     val normalized: Boolean = false,
     val count: Int,
     val type: String
 )
-data class GLTFBufferView(
+private data class GLTFBufferView(
     val buffer: Int,
     val byteOffset: Long,
     val byteLength: Int,
     val byteStride: Int = 0
 )
-data class GLTFBuffer(val uri: String) {
+private data class GLTFBuffer(val uri: String) {
     var handle: Int = 0
         get() {
             if(field == 0) {
-                val f = File(uri)
+                val f = File("./assets/$uri")
                 val data = when(f.isFile) {
                     true -> f.readBytes()
                     false -> Base64.getDecoder().decode(uri.substring(37))
@@ -104,8 +92,7 @@ data class GLTFBuffer(val uri: String) {
             return field
         }
 }
-
-data class GLTF(
+private data class GLTF(
     val scenes: List<GLTFScene>,
     val nodes: List<GLTFNode>,
     val meshes: List<GLTFMesh>,
@@ -114,6 +101,13 @@ data class GLTF(
     val buffers: List<GLTFBuffer>
 )
 
+class Mesh(val va:Int, val numIdices:Int, val compType:Int, val offset:Long) {
+    fun draw() {
+        glBindVertexArray(va)
+        glDrawElements(GL_TRIANGLES, numIdices, compType, offset)
+    }
+}
+
 class Model(private val meshes: List<Mesh>) {
     fun draw() = meshes.forEach {it.draw()}
 }
@@ -121,14 +115,19 @@ class Model(private val meshes: List<Mesh>) {
 fun loadModel(file: String): Model {
     val gltf = Klaxon().parse<GLTF>(File(file))!!
 
-    val scene = gltf.scenes[0]
-    val node = gltf.nodes[scene.nodes[0]]
-    val node2 = gltf.nodes[node.children[0]]
-    val mesh = gltf.meshes[node2.mesh]
-    val prim = mesh.primitives[0]
-    val m = prim.create(gltf)
+    val meshes = mutableListOf<Mesh>()
 
-    return Model(listOf(m))
+    val scene = gltf.scenes[0]
+    for(n in scene.nodes) {
+        val node = gltf.nodes[n]
+        if(node.mesh >= 0) {
+            val mesh = gltf.meshes[node.mesh]
+            val prim = mesh.primitives[0]
+            meshes.add(prim.create(gltf))
+        }
+    }
+
+    return Model(meshes)
 }
 
 fun checkGLError() {
