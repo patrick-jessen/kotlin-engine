@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="lwjgl">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl" />
+      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-opengl" />
+      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-glfw" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl" />
+      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-opengl" />
+      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-glfw" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-glfw" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-opengl" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl" recursive="false" type="SOURCES" />
+    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-glfw" recursive="false" type="SOURCES" />
+    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-opengl" recursive="false" type="SOURCES" />
+  </library>
+</component>
