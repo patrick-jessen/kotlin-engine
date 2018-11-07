@@ -1,4 +1,4 @@
-package org.patrick.game
+package org.patrick.game.engine
 
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
@@ -10,7 +10,7 @@ object Window {
     var title = "New Window"
     private var handle = 0L
 
-    fun open(setupFn:()->Unit, renderFn:()->Unit) {
+    fun open(setupFn:()->Unit, renderFn:()->Unit, destroyFn:()->Unit) {
         if(!glfwInit()) throw Exception("Unable to initialize window")
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
@@ -35,6 +35,7 @@ object Window {
             glfwPollEvents()
         }
 
+        destroyFn()
         glfwDestroyWindow(handle)
         glfwTerminate()
     }

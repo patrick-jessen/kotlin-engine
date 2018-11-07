@@ -3,18 +3,20 @@ package org.patrick.game
 import org.lwjgl.opengl.GL11.*
 import glm_.*
 import glm_.mat4x4.Mat4
+import org.patrick.game.engine.*
 
-fun main(args: Array<String>) = Window.open(::setup, ::render)
+fun main(args: Array<String>) = Window.open(::setup, ::render, ::destroy)
 
-var model: Model? = null
+var model = Model()
 var shader = Shader()
-
+var tex = Texture()
 
 fun setup() {
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
 
-    model = loadModel("./assets/monkey.gltf")
-    shader.load(vertSrc, fragSrc)
+    model = getModel("./assets/models/monkey.gltf")
+    shader = getShader("./assets/shaders/default")
+    tex = getTexture("./assets/textures/CesiumLogoFlat.png")
 
     val projMat = glm.perspective(glm.PIf / 2, 800f / 600f, 0.1f, 100f)
     val viewMat = glm.translate(Mat4(), 0f, 0f, -5f)
@@ -22,59 +24,20 @@ fun setup() {
     shader.set("viewProjMat", viewProjMat)
     shader.set("tex", 0)
 
-    loadTex()
+    tex.bind(0)
 }
-var red = 0f
 var rot = 0f
-
 fun render() {
-    shader.set("red", red)
-    red += 0.0001f
-    if(red > 1) red = 0f
-
     val modelMat = glm.eulerAngleY(rot)
     rot += 0.0001f
     shader.set("modelMat", modelMat)
 
     shader.use()
-    model!!.draw()
+    model.draw()
 }
 
-const val vertSrc = """
-#version 330 core
-layout (location = 0) in vec3 vertPos;
-layout (location = 1) in vec3 vertNorm;
-layout (location = 2) in vec2 vertUV;
-
-uniform mat4 viewProjMat;
-uniform mat4 modelMat;
-
-out vec3 fragNorm;
-out vec2 fragUV;
-
-void main() {
-  gl_Position = viewProjMat * modelMat * vec4(vertPos, 1.0);
-  fragNorm = vec3(modelMat * vec4(vertNorm, 1.0));
-  fragUV = vertUV;
-}"""
-
-const val fragSrc = """
-#version 330 core
-out vec4 fragColor;
-
-in vec3 fragNorm;
-in vec2 fragUV;
-uniform sampler2D tex;
-
-void main() {
-  float power = dot(fragNorm, normalize(vec3(1, 1, 1)));
-  //fragColor = vec4(fragUV.x * power, fragUV.y * power, 0, 1);
-  fragColor = texture(tex, fragUV) * max(power, 0.2);
+fun destroy() {
+    model.dereference()
+    shader.dereference()
+    tex.dereference()
 }
-"""
-
-val vertexData = floatArrayOf(
-    -1.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, 0.0f,
-    0.0f,  1.0f, 0.0f
-)

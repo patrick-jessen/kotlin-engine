@@ -1,8 +1,21 @@
-package org.patrick.game
+package org.patrick.game.engine
 
 import glm_.mat4x4.Mat4
-import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL20.*
+import java.io.File
+
+private val cache = mutableMapOf<String, Shader>()
+fun getShader(file:String): Shader {
+    val tex: Shader?
+    if (file in cache)
+        tex = cache[file]!!
+    else {
+        tex = Shader(file)
+        cache[file] = tex
+    }
+    tex.reference()
+    return tex
+}
 
 private fun compileShader(type:Int, src:String): Int {
     val handle = glCreateShader(type)
@@ -31,12 +44,17 @@ private fun createProgram(vertSrc:String, fragSrc:String): Int{
     return handle
 }
 
-class Shader {
+class Shader: RefCounter {
+    private var file = ""
     private var handle = 0
     private var uniforms = mutableMapOf<String, Int>()
 
-    fun load(vertSrc:String, fragSrc:String) {
-        handle = createProgram(vertSrc, fragSrc)
+    constructor()
+    constructor(file:String) {
+        this.file = file
+        val vert = File("$file.vert").readText()
+        val frag = File("$file.frag").readText()
+        handle = createProgram(vert, frag)
     }
 
     fun use() = glUseProgram(handle)
@@ -56,5 +74,10 @@ class Shader {
 
         uniforms[name] = glGetUniformLocation(handle, name)
         return uniforms[name]!!
+    }
+
+    override fun destroy() {
+        glDeleteProgram(handle)
+        cache.remove(file)
     }
 }
