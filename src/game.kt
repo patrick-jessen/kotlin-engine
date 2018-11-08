@@ -3,57 +3,45 @@ package org.patrick.game
 import org.lwjgl.opengl.GL11.*
 import glm_.*
 import glm_.mat4x4.Mat4
+import glm_.vec3.Vec3
 import org.patrick.game.engine.*
 
 fun main(args: Array<String>) = Window.open(::setup, ::render, ::destroy)
 
-var model: Model? = null
-var shader: Shader? = null
-var tex: Texture? = null
 var terrain: Terrain? = null
+var camera: Camera? = null
 
 fun setup() {
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
 
-//    model = Asset.model("monkey.gltf")
-//    shader = Asset.shader("default")
-//    tex = Asset.texture("CesiumLogoFlat.png")
+    val projMat = glm.perspective(glm.PIf / 2, 800f / 600f, 0.1f, 100000f)
+    camera = Camera(projMat, Vec3(0, 50, 500), glm.quatIdentity())
+    camera!!.activate()
 
-    val projMat = glm.perspective(glm.PIf / 2, 800f / 600f, 0.1f, 100f)
-    val viewMat = glm.translate(Mat4(), -1f, -1f, -1f)
-    val viewProjMat = projMat * viewMat
-//    shader!!.set("viewProjMat", viewProjMat)
-//    shader!!.set("tex", 0)
-//
-//    tex!!.bind(0)
-
-    terrain = Terrain(Asset.texture("height.png"))
-    Asset.shader("terrain").set("viewProjMat", viewProjMat)
-    Asset.shader("terrain").set("tex", 0)
+    terrain = Terrain(
+        Asset.texture("terrain-height.png"),
+        Asset.texture("terrain-diffuse.png")
+    )
 }
 var rot = 0f
 var camY = -0.7f
+
+var lastTime = System.currentTimeMillis()
+var frameCount = 0
+
 fun render() {
-    val projMat = glm.perspective(glm.PIf / 2, 800f / 600f, 0.1f, 100000f)
-    val viewMat = glm.translate(Mat4(), 0f, -200f, -1500f)
-    val viewProjMat = projMat * viewMat
-    Asset.shader("terrain").set("viewProjMat", viewProjMat)
-
-    //camY += 0.00001f
-
     val modelMat = glm.eulerAngleY(rot)
-    rot += 0.01f
-//    shader!!.set("modelMat", modelMat)
+    rot += 0.0002f
 
-//    shader!!.use()
-//    tex!!.bind(0)
-//    model!!.draw()
+    terrain!!.draw(modelMat)
 
-    //val modelMat = Mat4()
-    Asset.shader("terrain").set("modelMat", modelMat)
-    terrain!!.draw()
+    frameCount++
+    if(frameCount > 100) {
+        frameCount = 0
+        val frameTime = (System.currentTimeMillis() - lastTime) / 100
+        println("$frameTime ms (${1000/frameTime} fps)")
+        lastTime = System.currentTimeMillis()
+    }
 }
 
-fun destroy() {
-
-}
+fun destroy() {}

@@ -5,11 +5,10 @@ in vec3 fragNorm;
 in vec2 fragUV;
 
 in float height;
-uniform sampler2D tex;
+uniform sampler2D diffuseTex;
+uniform sampler2D heightMap;
 
 void main() {
   float power = dot(fragNorm, normalize(vec3(1, 1, 1)));
-  fragColor = vec4(height, height, height, 1);// * power;
-  //fragColor = vec4(fragUV, 0, 1);
-  //fragColor = texture2D(tex, fragUV);
+  fragColor = texture(diffuseTex, fragUV) * power;
 }

@@ -14,7 +14,10 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         createProgram(vert, frag)
     }
 
-    fun use() = glUseProgram(handle)
+    fun use() {
+        glUseProgram(handle)
+        set("viewProjMat", currentCamera.viewProjMat)
+    }
 
     fun set(uniform:String, value:Float) =
         glUniform1f(getUniform(uniform), value)
@@ -56,7 +59,6 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
     }
 
     private fun getUniform(name:String): Int {
-        use()
         if(name in uniforms) return uniforms[name]!!
 
         uniforms[name] = glGetUniformLocation(handle, name)

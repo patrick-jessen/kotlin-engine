@@ -1,10 +1,18 @@
 package org.patrick.game.engine
 
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13.*
 import javax.imageio.ImageIO
 import java.io.File
 
-class Texture internal constructor(file:String): Resource(file, ::Texture) {
+class TextureSettings(
+    val sWrap:Int     = GL_REPEAT,
+    val tWrap:Int     = GL_REPEAT,
+    val minFilter:Int = GL_LINEAR,
+    val magFilter:Int = GL_LINEAR
+)
+
+class Texture internal constructor(file:String, settings:TextureSettings): Resource(file, ::Texture) {
     private var handle = 0
 
     init {
@@ -14,12 +22,10 @@ class Texture internal constructor(file:String): Resource(file, ::Texture) {
 
         handle = glGenTextures()
         glBindTexture(GL_TEXTURE_2D, handle)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, settings.sWrap)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, settings.tWrap)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, settings.minFilter)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, settings.magFilter)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA,  GL_UNSIGNED_BYTE, pixels)
         glBindTexture(GL_TEXTURE_2D, 0)
     }
