@@ -10,7 +10,7 @@ class Model internal constructor(file:String): Resource(file, ::Model) {
     private var meshes = mutableListOf<Mesh>()
 
     init{
-        val gltf = Klaxon().parse<GLTF>(File(file))!!
+        val gltf = Klaxon().parse<GLTF>(File("./assets/models/$file"))!!
         val scene = gltf.scenes[0]
         for(n in scene.nodes) {
             val node = gltf.nodes[n]
@@ -26,19 +26,17 @@ class Model internal constructor(file:String): Resource(file, ::Model) {
     override fun destroy() = meshes.forEach{it.destroy()}
 }
 
-internal class Buffer: Resource {
+internal class Buffer(uri: String) : Resource("", ::Buffer) {
     internal var handle = 0
 
-    constructor(uri:String):super("", ::Buffer) {
+    init {
         val f = File("./assets/models/$uri")
         val data = when(f.isFile) {
             true -> f.readBytes()
             false -> Base64.getDecoder().decode(uri.substring(37))
         }
-
         val buf = BufferUtils.createByteBuffer(data.size).put(data)
         buf.rewind()
-
         handle = glGenBuffers()
         glBindBuffer(GL_ARRAY_BUFFER, handle)
         glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW)
@@ -47,7 +45,7 @@ internal class Buffer: Resource {
 
     override fun destroy() = glDeleteBuffers(handle)
 }
-internal class Mesh {
+internal class Mesh(gltf: GLTF, mp: GLTFMeshPrimitive) {
     private var handle = 0
     private var vertBuffer:Buffer? = null
     private var normBuffer:Buffer? = null
@@ -57,26 +55,22 @@ internal class Mesh {
     private var compType = 0
     private var offset = 0L
 
-    constructor(gltf: GLTF, mp:GLTFMeshPrimitive) {
+    init {
         handle = glGenVertexArrays()
         glBindVertexArray(handle)
-
         if("POSITION" in mp.attributes)
             vertBuffer = bindAttributeBuffer(gltf, mp, "POSITION", 0)
         if("NORMAL" in mp.attributes)
             normBuffer = bindAttributeBuffer(gltf, mp, "NORMAL", 1)
         if("TEXCOORD_0" in mp.attributes)
             texCoordBuffer = bindAttributeBuffer(gltf, mp, "TEXCOORD_0", 2)
-
         val accessor = gltf.accessors[mp.indices]
         val bufView = gltf.bufferViews[accessor.bufferView]
         val buf = gltf.buffers[bufView.buffer]
         buf.buffer!!.capture()
-
         idxBuffer = buf.buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf.buffer!!.handle)
         glBindVertexArray(0)
-
         numIndices = accessor.count
         compType = accessor.componentType
         offset = bufView.byteOffset+accessor.byteOffset

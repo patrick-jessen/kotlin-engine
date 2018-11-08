@@ -9,8 +9,8 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
     private var uniforms = mutableMapOf<String, Int>()
 
     init {
-        val vert = File("$file.vert").readText()
-        val frag = File("$file.frag").readText()
+        val vert = File("./assets/shaders/$file.vert").readText()
+        val frag = File("./assets/shaders/$file.frag").readText()
         createProgram(vert, frag)
     }
 
@@ -30,6 +30,8 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         glShaderSource(handle, src)
         glCompileShader(handle)
 
+        println(glGetShaderInfoLog(handle))
+
         val status = glGetShaderi(handle, GL_COMPILE_STATUS)
         if(status == GL_FALSE) throw Exception(glGetShaderInfoLog(handle))
         return handle
@@ -43,6 +45,9 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         glAttachShader(handle, vert)
         glAttachShader(handle, frag)
         glLinkProgram(handle)
+
+        println(glGetProgramInfoLog(handle))
+
         val status = glGetProgrami(handle, GL_LINK_STATUS)
         if(status == GL_FALSE) throw Exception(glGetProgramInfoLog(handle))
 

@@ -24,7 +24,7 @@ object Window {
         glfwMakeContextCurrent(handle)
         GL.createCapabilities()
 
-        glEnable(GL_CULL_FACE)
+        //glEnable(GL_CULL_FACE)
         glEnable(GL_DEPTH_TEST)
         setupFn()
 
