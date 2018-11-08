@@ -6,26 +6,10 @@ import org.lwjgl.opengl.GL30.*
 import java.io.File
 import java.util.*
 
-private val cache = mutableMapOf<String, Model>()
-fun getModel(file:String): Model {
-    val tex: Model?
-    if (file in cache)
-        tex = cache[file]!!
-    else {
-        tex = Model(file)
-        cache[file] = tex
-    }
-    tex.reference()
-    return tex
-}
-
-class Model: RefCounter {
-    private var file = ""
+class Model internal constructor(file:String): Resource(file, ::Model) {
     private var meshes = mutableListOf<Mesh>()
 
-    constructor()
-    internal constructor(file:String) {
-        this.file = file
+    init{
         val gltf = Klaxon().parse<GLTF>(File(file))!!
         val scene = gltf.scenes[0]
         for(n in scene.nodes) {
@@ -39,17 +23,13 @@ class Model: RefCounter {
     }
 
     fun draw() = meshes.forEach {it.draw()}
-    override fun destroy() {
-        meshes.forEach{it.destroy()}
-        cache.remove(file)
-    }
+    override fun destroy() = meshes.forEach{it.destroy()}
 }
 
-internal class Buffer: RefCounter {
+internal class Buffer: Resource {
     internal var handle = 0
 
-    constructor()
-    constructor(uri:String) {
+    constructor(uri:String):super("", ::Buffer) {
         val f = File("./assets/models/$uri")
         val data = when(f.isFile) {
             true -> f.readBytes()
@@ -68,14 +48,14 @@ internal class Buffer: RefCounter {
     override fun destroy() = glDeleteBuffers(handle)
 }
 internal class Mesh {
-    var handle = 0
-    var vertBuffer = Buffer()
-    var normBuffer = Buffer()
-    var texCoordBuffer = Buffer()
-    var idxBuffer = Buffer()
-    var numIndices = 0
-    var compType = 0
-    var offset = 0L
+    private var handle = 0
+    private var vertBuffer:Buffer? = null
+    private var normBuffer:Buffer? = null
+    private var texCoordBuffer:Buffer? = null
+    private var idxBuffer:Buffer? = null
+    private var numIndices = 0
+    private var compType = 0
+    private var offset = 0L
 
     constructor(gltf: GLTF, mp:GLTFMeshPrimitive) {
         handle = glGenVertexArrays()
@@ -91,10 +71,10 @@ internal class Mesh {
         val accessor = gltf.accessors[mp.indices]
         val bufView = gltf.bufferViews[accessor.bufferView]
         val buf = gltf.buffers[bufView.buffer]
-        buf.buffer.reference()
+        buf.buffer!!.capture()
 
         idxBuffer = buf.buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf.buffer.handle)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf.buffer!!.handle)
         glBindVertexArray(0)
 
         numIndices = accessor.count
@@ -102,11 +82,11 @@ internal class Mesh {
         offset = bufView.byteOffset+accessor.byteOffset
     }
 
-    private fun bindAttributeBuffer(gltf: GLTF, mp:GLTFMeshPrimitive, name:String, attribIdx:Int):Buffer {
+    private fun bindAttributeBuffer(gltf: GLTF, mp:GLTFMeshPrimitive, name:String, attribIdx:Int):Buffer? {
         val accessor = gltf.accessors[mp.attributes[name]!!]
         val bufView = gltf.bufferViews[accessor.bufferView]
         val buf = gltf.buffers[bufView.buffer]
-        buf.buffer.reference()
+        buf.buffer!!.capture()
 
         val size = when(accessor.type) {
             "SCALAR"    -> 1
@@ -116,7 +96,7 @@ internal class Mesh {
             else        -> throw Exception("Invalid accessor type")
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, buf.buffer.handle)
+        glBindBuffer(GL_ARRAY_BUFFER, buf.buffer!!.handle)
         glVertexAttribPointer(
             attribIdx, size, accessor.componentType, accessor.normalized,
             bufView.byteStride, bufView.byteOffset + accessor.byteOffset
@@ -132,10 +112,10 @@ internal class Mesh {
     }
 
     fun destroy() {
-        vertBuffer.dereference()
-        normBuffer.dereference()
-        texCoordBuffer.dereference()
-        idxBuffer.dereference()
+        vertBuffer?.release()
+        normBuffer?.release()
+        texCoordBuffer?.release()
+        idxBuffer?.release()
     }
 }
 
@@ -162,9 +142,9 @@ internal data class GLTFBufferView(
     val byteStride: Int = 0
 )
 internal data class GLTFBuffer(val uri: String) {
-    var buffer = Buffer()
+    var buffer:Buffer? = null
         get() {
-            if(field.handle == 0) field = Buffer(uri)
+            if(field == null) field = Buffer(uri)
             return field
         }
 }
