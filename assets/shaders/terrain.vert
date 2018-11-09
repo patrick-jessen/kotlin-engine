@@ -1,4 +1,6 @@
 #version 330 core
+layout (location = 0) in vec2 vertPos;
+
 const int size = 848;
 const float heightScale = 50;
 const int smoothFactor = 2;
@@ -15,44 +17,46 @@ layout (std140) uniform data3D
 
 uniform sampler2D heightMap;
 
-vec2 getUV(int triangle, int vertex) {
-  int X = (triangle / 2) % size;
-  int Y = (triangle / 2) / size;
-  if(triangle % 2 == 0) {
-    if(vertex == 1) Y++;
-    else if(vertex == 2) X++;
-  }
-  else {
-    if(vertex == 0) {
-        X++;
-        Y++;
-    }
-    else if(vertex == 1) X++;
-    else if(vertex == 2) Y++;
-  }
-  return vec2(X, Y) / size;
+vec2 getCoord(int quad) {
+  float X = quad % size;
+  float Y = quad / size;
+  X += vertPos.x;
+  Y += vertPos.y;
+  return vec2(X, Y);
 }
-vec3 getPos(vec2 UV) {
-  vec4 col = texture(heightMap, UV);
-  return vec3(
-    UV.x*size - size/2,
-    col.r * heightScale - heightScale/2,
-    UV.y*size - size/2
+vec2 getUV(vec2 coord) {
+    return coord / size;
+}
+float getHeight(vec2 coord) {
+    return texture(heightMap, getUV(coord)).r  * heightScale - heightScale/2;
+}
+vec4 getPos(vec2 coord, float height) {
+  return vec4(
+    coord.x - size/2,
+    height,
+    coord.y - size/2,
+    1
   );
 }
 
 void main() {
-  vec2 UV = getUV(gl_InstanceID, gl_VertexID);
-  vec3 pos = getPos(UV);
+  vec2 coord = getCoord(gl_InstanceID);
+  vec2 UV = getUV(coord);
+  float h = getHeight(coord);
 
-  vec3 otherPos1 = getPos(UV + vec2(1,0));
-  vec3 otherPos2 = getPos(UV + vec2(0,1));
-  vec3 prevPos1 = getPos(UV + vec2(-1,0));
-  vec3 prevPos2 = getPos(UV + vec2(0,-1));
-  vec3 norm = normalize(cross(otherPos2-pos, otherPos1-pos));
-  //norm = cross(vec3(0, 0, 1), otherPos1 - prevPos1);
+  vec3 off = vec3(2.0,2.0, 0.0);
+  float hL = getHeight(coord - off.xz);
+  float hR = getHeight(coord + off.xz);
+  float hD = getHeight(coord - off.zy);
+  float hU = getHeight(coord + off.zy);
 
-  gl_Position = viewProjMat * (modelMat * vec4(pos, 1.0));
-  fragNorm = mat3(modelMat) * norm;
+  vec3 normal;
+  normal.x = hL - hR;
+  normal.y = 2;
+  normal.z = hD - hU;
+  normal = normalize(normal);
+
+  gl_Position = viewProjMat * (modelMat * getPos(coord, h));
+  fragNorm = mat3(modelMat) * normal;
   fragUV = UV;
 }

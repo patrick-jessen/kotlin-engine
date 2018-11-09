@@ -17,11 +17,11 @@ object QuadBuffer {
         val buf = BufferUtils.createFloatBuffer(12).put(
             floatArrayOf(
                 0f,0f,
+                0f,1f,
                 1f,0f,
-                0f,1f,
                 1f,1f,
-                0f,1f,
-                1f,0f
+                1f,0f,
+                0f,1f
             )
         )
         buf.rewind()
