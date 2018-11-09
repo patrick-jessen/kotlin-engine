@@ -11,4 +11,5 @@ uniform sampler2D heightMap;
 void main() {
   float power = dot(fragNorm, normalize(vec3(1, 1, 1)));
   fragColor = texture(diffuseTex, fragUV) * power;
+  //fragColor = vec4(fragNorm, 1);
 }
