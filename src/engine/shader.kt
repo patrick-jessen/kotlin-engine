@@ -4,30 +4,35 @@ import glm_.mat4x4.Mat4
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import org.lwjgl.BufferUtils
-import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL31.*
 import java.io.File
-import java.nio.ByteBuffer
 
-val uniformBuffers = mutableListOf<UniformBuffer>()
+object UniformBuffers {
+    internal var ubos = mutableMapOf<String, UniformBuffer>()
+    fun add(name:String, bytes:Int) {
+        if(Engine.state != EngineState.SETUP)
+            throw Exception("Uniform buffers must be set in SETUP state")
+        ubos[name] = UniformBuffer(bytes)
+    }
+    fun set(name:String, data: FloatArray) {
+        ubos[name]!!.set(data)
+    }
+}
 
-class UniformBuffer(val name:String, bytes:Int) {
-    var handle = 0
+internal class UniformBuffer(bytes:Int) {
+    private var handle = 0
+    internal var index = 0
     init {
         val buf = BufferUtils.createByteBuffer(bytes)
 
+        index = UniformBuffers.ubos.size
         handle = glGenBuffers()
         glBindBuffer(GL_UNIFORM_BUFFER, handle)
         glBufferData(GL_UNIFORM_BUFFER, buf, GL_STATIC_DRAW)
-        glBindBufferBase(GL_UNIFORM_BUFFER, uniformBuffers.size, handle)
+        glBindBufferBase(GL_UNIFORM_BUFFER, index, handle)
         glBindBuffer(GL_UNIFORM_BUFFER, 0)
     }
 
-    fun set(data:ByteBuffer) {
-        glBindBuffer(GL_UNIFORM_BUFFER, handle)
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, data)
-        glBindBuffer(GL_UNIFORM_BUFFER, 0)
-    }
     fun set(data:FloatArray) {
         glBindBuffer(GL_UNIFORM_BUFFER, handle)
         glBufferSubData(GL_UNIFORM_BUFFER, 0, data)
@@ -45,9 +50,9 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         createProgram(vert, frag)
 
         glUseProgram(handle)
-        for((i, ubo) in uniformBuffers.withIndex()) {
-            val ubi = glGetUniformBlockIndex(handle, ubo.name)
-            glUniformBlockBinding(handle, ubi, i)
+        for((key, ubo) in UniformBuffers.ubos) {
+            val ubi = glGetUniformBlockIndex(handle, key)
+            glUniformBlockBinding(handle, ubi, ubo.index)
         }
         glUseProgram(0)
     }

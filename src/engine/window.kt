@@ -10,7 +10,7 @@ object Window {
     var title = "New Window"
     private var handle = 0L
 
-    fun open(setupFn:()->Unit, renderFn:()->Unit, destroyFn:()->Unit) {
+    internal fun open() {
         if(!glfwInit()) throw Exception("Unable to initialize window")
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
@@ -26,16 +26,17 @@ object Window {
 
         glEnable(GL_CULL_FACE)
         glEnable(GL_DEPTH_TEST)
-        setupFn()
+    }
 
-        while (!glfwWindowShouldClose(handle)) {
-            glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-            renderFn()
-            glfwSwapBuffers(handle)
-            glfwPollEvents()
-        }
+    internal fun shouldClose(): Boolean = glfwWindowShouldClose(handle)
 
-        destroyFn()
+    internal fun update() {
+        glfwSwapBuffers(handle)
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        glfwPollEvents()
+    }
+
+    internal fun close() {
         glfwDestroyWindow(handle)
         glfwTerminate()
     }
