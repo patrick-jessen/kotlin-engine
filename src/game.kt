@@ -6,6 +6,7 @@ import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import org.patrick.game.engine.*
 import org.patrick.game.engine.ui.Panel
+import org.patrick.game.engine.ui.Text
 
 fun main(args: Array<String>) = Engine.start(::setup, ::run)
 
@@ -34,7 +35,10 @@ fun run() {
 
         glEnable(GL_BLEND)
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        panel.draw()
+        //panel.draw()
+
+        Text("${Engine.fps} fps", Vec2(5,5)).draw()
+
         glDisable(GL_BLEND)
     }
 }

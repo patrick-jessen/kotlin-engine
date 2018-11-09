@@ -21,22 +21,24 @@ object Engine {
         while(!Window.shouldClose()) {
             Window.update()
             renderFn()
-            //printFPS()
+            calcFPS();
         }
 
         Window.close()
     }
 
-    fun printFPS() {
+    private fun calcFPS() {
         frameCount++
         if (frameCount > 100) {
             frameCount = 0
             var frameTime = (System.currentTimeMillis() - lastTime) / 100
             if (frameTime == 0L) frameTime = 1L
             lastTime = System.currentTimeMillis()
-            println("$frameTime ms (${1000 / frameTime} fps)")
+            fps = 1000f / frameTime
         }
     }
+    var fps = 0f
+        private set
     private var lastTime = 0L
     private var frameCount = 0
 }

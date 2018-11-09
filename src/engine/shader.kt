@@ -3,6 +3,7 @@ package org.patrick.game.engine
 import glm_.mat4x4.Mat4
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
+import glm_.vec4.Vec4
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL31.*
 import java.io.File
@@ -67,6 +68,9 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
 
     fun set(uniform:String, value: Vec3) =
         glUniform3f(getUniform(uniform), value.x, value.y, value.z)
+
+    fun set(uniform:String, value: Vec4) =
+        glUniform4f(getUniform(uniform), value.x, value.y, value.z, value.w)
 
     fun set(uniform:String, value:Int) =
         glUniform1i(getUniform(uniform), value)
