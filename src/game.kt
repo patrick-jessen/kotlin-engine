@@ -24,23 +24,29 @@ fun run() {
     camera.activate()
 
     val terrain = Terrain(Asset.texture("terrain-height.png"), Asset.texture("terrain-diffuse.png"))
-    val panel = Panel(Vec2(0, 0), Vec2(200, 40))
+    val panel = Panel(Vec2(100, 100), Vec2(400, 200))
+
+    var rot = 0f
 
     Engine.render {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
 
         val modelMat = glm.eulerAngleY(rot)
-        rot += 0.0006f
+        rot  += 0.0001f * Engine.frameTime
         terrain.draw(modelMat)
 
-        glEnable(GL_BLEND)
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        //panel.draw()
-
-        Text("${Engine.fps} fps", Vec2(5,5)).draw()
-
-        glDisable(GL_BLEND)
+        GUI {
+            panel.draw()
+            Text("${Engine.fps.toInt()} fps", Vec2(5, 5)).draw()
+        }
     }
 }
 
-var rot = 0f
+fun GUI(fn:()->Unit) {
+    glDisable(GL_DEPTH_TEST)
+    glEnable(GL_BLEND)
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    fn()
+    glDisable(GL_BLEND)
+    glEnable(GL_DEPTH_TEST)
+}

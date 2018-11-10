@@ -1,22 +1,28 @@
 #version 330 core
 layout (location = 0) in vec2 vertPos;
 
-const float fontWidth = 464;
-const float height = 24;
-const float widths[] = {
-//a
-12,13,12,14,13,8,14,13,
-//i
-6,6,13,6,21,13,15,14,
-//q
-14,9,10,9,12,14,19,13,13,12,
-7, // space
-//0
-15, 12, 14, 13, 16, 14, 14, 14, 14, 13
+const int numCharsInFont = 95;
+const float ratios[] = {
+  // symbols
+  0.28,0.28,0.43,0.57,0.57,0.77,0.77,0.28,0.3,0.3,0.43,0.6,0.28,0.37,0.28,0.4,
+  // numbers
+  0.57,0.57,0.57,0.57,0.57,0.57,0.57,0.57,0.57,0.57,
+  // symbols
+  0.28,0.28,0.6,0.6,0.6,0.5,0.7,
+  // uppercase letters
+  0.73,0.57,0.6,0.7,0.53,0.43,0.7,0.73,0.27,0.27,0.6,0.53,0.9,0.7,0.8,0.53,0.8,0.54,0.53,0.47,0.7,0.6,0.93,0.63,0.54,0.6,
+  // symbols
+  0.3,0.54,0.3,0.6,0.5,0.4,
+  // lowercase letters
+  0.47,0.54,0.46,0.58,0.53,0.26,0.58,0.54,0.24,0.24,0.48,0.24,0.87,0.54,0.57,0.59,0.59,0.33,0.43,0.33,0.54,0.53,0.77,0.53,0.5,0.47,
+  // symbols
+  0.3,0.6,0.3,0.6
 };
 
+uniform int size;
 uniform vec2 pos;
-uniform mat4 str;
+uniform int str[64];
+uniform sampler2D font;
 layout (std140) uniform data2D
 {
     mat4 viewProjMat;
@@ -24,44 +30,34 @@ layout (std140) uniform data2D
 
 out vec2 fragUV;
 
-float getCharWidth(int char) {
-    return widths[char];
-}
-
-float getUVOffset(int char) {
-    float x = 0;
-    for(int c = char-1; c >= 0; c--) {
-        x += getCharWidth(c);
-    }
-    return x / fontWidth;
+float getCharRatio(int char) {
+    return ratios[char];
 }
 
 int getChar(int idx) {
-    int char = int(str[idx%4][idx/4]);
-    if(char == 32)
-        return 26;
-    if(char >= 48 && char <= 57) // numbers
-        return 27+char-48;
-    else
-        return char - 97;
+    int dataIdx = idx / 4;
+    int shift = 8 * (3 - (idx % 4));
+    return ((str[dataIdx]>>shift) & 0xff) - 32;
 }
 
 void main() {
+  vec2 texSize = textureSize(font, 0);
+  float height = texSize.y / numCharsInFont;
+
   int char = getChar(gl_InstanceID);
   float x = 0;
-  float w = getCharWidth(char);
-
   for(int c = gl_InstanceID-1; c >= 0; c--) {
     int currChar = getChar(c);
-    x += getCharWidth(currChar);
+    x += height * getCharRatio(currChar);
   }
 
-
-  vec2 p = vertPos * vec2(w, height) + vec2(x, 0) + pos;
+  vec2 p = vertPos * vec2(texSize.x, height) + vec2(x, 0);
+  p *= float(size)/height;
+  p += pos;
   gl_Position = viewProjMat * vec4(p, 0, 1.0);
 
   vec2 UV = vertPos;
-  UV.x *= w/fontWidth;
-  UV.x += getUVOffset(char);
+  UV.y /= numCharsInFont;
+  UV.y += float(char)/numCharsInFont;
   fragUV = UV;
 }

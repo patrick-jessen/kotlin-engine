@@ -6,8 +6,8 @@ import javax.imageio.ImageIO
 import java.io.File
 
 class TextureSettings(
-    val sWrap:Int     = GL_REPEAT,
-    val tWrap:Int     = GL_REPEAT,
+    val sWrap:Int     = GL_CLAMP_TO_EDGE,
+    val tWrap:Int     = GL_CLAMP_TO_EDGE,
     val minFilter:Int = GL_LINEAR,
     val magFilter:Int = GL_LINEAR
 )

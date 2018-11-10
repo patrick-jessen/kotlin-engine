@@ -1,6 +1,9 @@
 package org.patrick.game.engine
 
+import glm_.random
 import org.lwjgl.opengl.GL11.*
+import java.util.*
+import kotlin.random.Random
 import kotlin.reflect.KFunction
 
 enum class EngineState { UNINITIALIZED, SETUP, RUNNING }
@@ -21,24 +24,21 @@ object Engine {
         while(!Window.shouldClose()) {
             Window.update()
             renderFn()
-            calcFPS();
+            calcFrameTime()
         }
 
         Window.close()
     }
 
-    private fun calcFPS() {
-        frameCount++
-        if (frameCount > 100) {
-            frameCount = 0
-            var frameTime = (System.currentTimeMillis() - lastTime) / 100
-            if (frameTime == 0L) frameTime = 1L
-            lastTime = System.currentTimeMillis()
-            fps = 1000f / frameTime
-        }
+    private fun calcFrameTime() {
+        frameTime = (System.nanoTime() - lastTime).toFloat() / 1000000f
+        if (frameTime == 0f) frameTime = 1f
+        lastTime = System.nanoTime()
     }
-    var fps = 0f
-        private set
     private var lastTime = 0L
-    private var frameCount = 0
+    var frameTime = 1f
+    var fps = 0f
+        get() = 1000f/ frameTime
+
+    var test = 1f
 }

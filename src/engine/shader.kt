@@ -7,6 +7,7 @@ import glm_.vec4.Vec4
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL31.*
 import java.io.File
+import java.nio.IntBuffer
 
 object UniformBuffers {
     internal var ubos = mutableMapOf<String, UniformBuffer>()
@@ -59,6 +60,9 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
     }
 
     fun use() = glUseProgram(handle)
+
+    fun set(uniform:String, value: IntArray) =
+        glUniform1iv(getUniform(uniform), value)
 
     fun set(uniform:String, value:Float) =
         glUniform1f(getUniform(uniform), value)
