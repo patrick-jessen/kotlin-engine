@@ -4,8 +4,9 @@ import org.lwjgl.opengl.GL11.*
 import glm_.*
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
+import glm_.vec4.Vec4
 import org.patrick.game.engine.*
-import org.patrick.game.engine.ui.Panel
+import org.patrick.game.engine.ui.Sprite
 import org.patrick.game.engine.ui.Text
 
 fun main(args: Array<String>) = Engine.start(::setup, ::run)
@@ -16,15 +17,18 @@ fun setup() {
     UniformBuffers.set("data2D", glm.ortho(0f, 800f, 600f, 0f, 0f, 1f).toFloatArray())
 
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE)
 }
 
 fun run() {
     val projMat = glm.perspective(glm.PIf / 3, 800f / 600f, 0.1f, 100000f)
-    val camera = Camera(projMat, Vec3(0, 100, 500), glm.quatIdentity())
+    val camera = Camera(projMat, Vec3(0, 10, 0), glm.quatIdentity())
     camera.activate()
 
-    val terrain = Terrain(Asset.texture("terrain-height.png"), Asset.texture("terrain-diffuse.png"))
-    val panel = Panel(Vec2(100, 100), Vec2(400, 200))
+    val terrain = Terrain(Asset.texture("terrain2.png"), Asset.texture("terrain-diffuse.png"))
+    val panel = Sprite(size = Vec2(65, 25),
+        slicePoints = Vec4(8,8,8,8)
+    )
 
     var rot = 0f
 
@@ -32,7 +36,7 @@ fun run() {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
 
         val modelMat = glm.eulerAngleY(rot)
-        rot  += 0.0001f * Engine.frameTime
+        rot  += 0.0003f * Engine.frameTime
         terrain.draw(modelMat)
 
         GUI {

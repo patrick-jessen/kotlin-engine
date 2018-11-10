@@ -1,6 +1,7 @@
 package org.patrick.game.engine.ui
 
 import glm_.vec2.Vec2
+import glm_.vec4.Vec4
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL31.*
 import org.patrick.game.engine.Asset
@@ -45,22 +46,30 @@ object QuadBuffer {
     }
 }
 
-class Panel(val pos:Vec2, val size:Vec2, val texture: Texture = Asset.texture("panel.png")) {
-    private var shader: Shader? = null
+class Sprite(
+    private val pos:Vec2 = Vec2(),
+    private val size:Vec2 = Vec2(100,100),
+    private val texture: Texture = Asset.texture("panel.png"),
+    private val slicePoints: Vec4 = Vec4()
+) {
+    private var shader = Asset.shader("sprite")
 
     init {
-        shader = Asset.shader("panel")
-        shader!!.set("tex", 0)
+        shader.set("tex", 0)
         QuadBuffer.init()
     }
 
     fun draw() {
-        shader!!.use()
-        shader!!.set("pos", pos)
-        shader!!.set("size", size)
+        shader.use()
+        shader.set("pos", pos)
+        shader.set("size", size)
+        shader.set("slicePoints", slicePoints)
 
         texture.bind(0)
 
-        QuadBuffer.draw(1)
+        if(slicePoints.length2() > 0)
+            QuadBuffer.draw(9)
+        else
+            QuadBuffer.draw(1)
     }
 }

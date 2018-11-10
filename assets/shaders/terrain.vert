@@ -2,9 +2,8 @@
 layout (location = 0) in vec2 vertPos;
 
 const int size = 848;
-const float heightScale = 50;
+const float heightScale = 5000;
 const int smoothFactor = 2;
-
 uniform mat4 modelMat;
 
 out vec3 fragNorm;
@@ -28,7 +27,9 @@ vec2 getUV(vec2 coord) {
     return coord / size;
 }
 float getHeight(vec2 coord) {
-    return texture(heightMap, getUV(coord)).r  * heightScale - heightScale/2;
+    //return texture(heightMap, getUV(coord)).r  * heightScale;
+    float h = texture(heightMap, getUV(coord)).r;
+    return pow(h, 5) * heightScale;
 }
 vec4 getPos(vec2 coord, float height) {
   return vec4(
@@ -44,7 +45,7 @@ void main() {
   vec2 UV = getUV(coord);
   float h = getHeight(coord);
 
-  vec3 off = vec3(2.0,2.0, 0.0);
+  vec3 off = vec3(smoothFactor,smoothFactor, 0.0);
   float hL = getHeight(coord - off.xz);
   float hR = getHeight(coord + off.xz);
   float hD = getHeight(coord - off.zy);
