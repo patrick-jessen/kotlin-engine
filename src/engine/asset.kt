@@ -4,8 +4,6 @@ import kotlin.reflect.KFunction
 
 object Asset {
     private val textures = mutableMapOf<String, Texture>()
-    private val textureMeta = mutableMapOf<String, TextureSettings>()
-
     private val shaders = mutableMapOf<String, Shader>()
     private val models = mutableMapOf<String, Model>()
 
@@ -13,7 +11,7 @@ object Asset {
         return when(file in textures) {
             true -> textures[file]!!
             false -> {
-                val tex = Texture(file, textureMeta[file] ?: TextureSettings())
+                val tex = Texture(file)
                 textures[file] = tex
                 tex
             }
@@ -47,8 +45,6 @@ object Asset {
             ::Model -> models.remove(id)
         }
     }
-
-    fun setTextureMeta(file:String, meta:TextureSettings) { textureMeta[file] = meta }
 }
 
 abstract class Resource internal constructor(private val id:String, private val type:KFunction<Any>) {

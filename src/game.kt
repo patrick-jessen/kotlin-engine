@@ -6,6 +6,8 @@ import glm_.quat.Quat
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import glm_.vec4.Vec4
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL30.*
 import org.patrick.game.engine.*
 import org.patrick.game.engine.ui.Sprite
 import org.patrick.game.engine.ui.Text
@@ -17,16 +19,21 @@ fun setup() {
 
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE)
+
+    TextureSettings.add("h.png",
+        internalFormat= GL_RGBA,
+        format = GL_RGBA,
+        type = GL_FLOAT,
+        minFilter = GL_NEAREST,
+        magFilter = GL_NEAREST
+    )
 }
 
 fun run() {
-    val camera = Camera(glm.PIf / 3, Vec3(0, 0, 500))
+    val camera = Camera(glm.PIf / 3, Vec3(0, 0, 1000))
     camera.activate()
 
-    val terrain = Terrain(Asset.texture("terrain-height.png"), Asset.texture("terrain-diffuse.png"))
-    val panel = Sprite(size = Vec2(65, 25),
-        slicePoints = Vec4(8,8,8,8)
-    )
+    val terrain = Terrain(Asset.texture("h.png"), Asset.texture("terrain-diffuse.png"))
 
     var rotX = 0f
     var rotY = 0f
@@ -45,13 +52,15 @@ fun run() {
             rotX +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).y
             lastMousePos = Window.mousePos
         }
+        currentCamera.pos.z -= Window.scroll * 2 * Engine.frameTime
+
 
         terrain.draw(modelMat)
 
-        GUI {
-            panel.draw()
-            Text("${Engine.fps.toInt()} fps", Vec2(5, 5)).draw()
-        }
+//        GUI {
+//            Sprite(size = Vec2(65, 25), slicePoints = Vec4(8,8,8,8)).draw()
+//            Text("${Engine.fps.toInt()} fps", Vec2(5, 5)).draw()
+//        }
     }
 }
 
