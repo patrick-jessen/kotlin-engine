@@ -36,8 +36,7 @@ object Window {
 
         glfwSetFramebufferSizeCallback(handle, ::onResize)
         glfwSetKeyCallback(handle, ::onKey)
-//        winHandle.SetKeyCallback(keyCallback)
-//        winHandle.SetMouseButtonCallback(mouseButtonCallback)
+        glfwSetMouseButtonCallback(handle, ::onMouseButton)
 //        winHandle.SetCursorPosCallback(cursorPosCallback)
 //        winHandle.SetScrollCallback(scrollCallback)
         glfwSwapInterval(1)
@@ -59,6 +58,8 @@ object Window {
     internal fun update() {
         keysPressed.clear()
         keysReleased.clear()
+        mouseButtonsPressed.clear()
+        mouseButtonsReleased.clear()
 
         glfwSwapBuffers(handle)
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
@@ -85,13 +86,30 @@ object Window {
             keysReleased[key] = true
         }
     }
+    private fun onMouseButton(win:Long, button:Int, action:Int, modifiers:Int) {
+        if(action == 1) {
+            mouseButtonsDown[button] = true
+            mouseButtonsPressed[button] = true
+        }
+        else if(action == 0) {
+            mouseButtonsDown[button] = false
+            mouseButtonsReleased[button] = true
+        }
+    }
 
     private var keysPressed = mutableMapOf<Int, Boolean>()
     private var keysReleased = mutableMapOf<Int, Boolean>()
     private var keysDown = mutableMapOf<Int, Boolean>()
-    fun keyDown(k:Int):Boolean = keysDown[k] ?: false
     fun keyPressed(k:Int):Boolean = keysPressed[k] ?: false
     fun keyReleased(k:Int):Boolean = keysReleased[k] ?: false
+    fun keyDown(k:Int):Boolean = keysDown[k] ?: false
+
+    private var mouseButtonsPressed = mutableMapOf<Int, Boolean>()
+    private var mouseButtonsReleased = mutableMapOf<Int, Boolean>()
+    private var mouseButtonsDown = mutableMapOf<Int, Boolean>()
+    fun mouseButtonPressed(k:Int):Boolean = mouseButtonsPressed[k] ?: false
+    fun mouseButtonReleased(k:Int):Boolean = mouseButtonsReleased[k] ?: false
+    fun mouseButtonDown(k:Int):Boolean = mouseButtonsDown[k] ?: false
 }
 
 fun checkGLError() {

@@ -34,9 +34,9 @@ fun run() {
 
         val modelMat = glm.eulerAngleY(rot)
         var deltaRot = 0.01f * Engine.frameTime
-        if(Window.keyDown(65))
+        if(Window.mouseButtonReleased(0))
             deltaRot = -deltaRot
-        else if(!Window.keyDown(68))
+        else if(!Window.mouseButtonReleased(1))
             deltaRot = 0f
 
         rot += deltaRot
