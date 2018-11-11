@@ -1,7 +1,9 @@
 package org.patrick.game.engine
 
+import glm_.glm
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil.NULL
 
@@ -21,8 +23,12 @@ object Window {
         handle = glfwCreateWindow(size.first, size.second, title, NULL, NULL)
         if(handle == NULL) throw Exception("Failed to create window")
 
+        glfwSetFramebufferSizeCallback(handle, ::onResize)
+
         glfwMakeContextCurrent(handle)
         GL.createCapabilities()
+
+        glfwSwapInterval(1)
 
         glEnable(GL_CULL_FACE)
         glEnable(GL_DEPTH_TEST)
@@ -39,6 +45,12 @@ object Window {
     internal fun close() {
         glfwDestroyWindow(handle)
         glfwTerminate()
+    }
+
+    private fun onResize(win:Long, width:Int, height:Int) {
+        glViewport(0, 0, width, height)
+        UniformBuffers.set("data2D", glm.ortho(0f, width.toFloat(), height.toFloat(), 0f, 0f, 1f).toFloatArray())
+        size = Pair(width, height)
     }
 }
 

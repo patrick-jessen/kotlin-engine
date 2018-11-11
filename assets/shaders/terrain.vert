@@ -2,7 +2,7 @@
 layout (location = 0) in vec2 vertPos;
 
 const int size = 848;
-const float heightScale = 5000;
+const float heightScale = 1000;
 const int smoothFactor = 2;
 uniform mat4 modelMat;
 

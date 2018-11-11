@@ -21,11 +21,10 @@ fun setup() {
 }
 
 fun run() {
-    val projMat = glm.perspective(glm.PIf / 3, 800f / 600f, 0.1f, 100000f)
-    val camera = Camera(projMat, Vec3(0, 10, 0), glm.quatIdentity())
+    val camera = Camera(glm.PIf / 3, Vec3(0, 50, 100))
     camera.activate()
 
-    val terrain = Terrain(Asset.texture("terrain2.png"), Asset.texture("terrain-diffuse.png"))
+    val terrain = Terrain(Asset.texture("terrain-height.png"), Asset.texture("terrain-diffuse.png"))
     val panel = Sprite(size = Vec2(65, 25),
         slicePoints = Vec4(8,8,8,8)
     )
