@@ -33,7 +33,13 @@ fun run() {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
 
         val modelMat = glm.eulerAngleY(rot)
-        rot  += 0.0003f * Engine.frameTime
+        var deltaRot = 0.01f * Engine.frameTime
+        if(Window.keyDown(65))
+            deltaRot = -deltaRot
+        else if(!Window.keyDown(68))
+            deltaRot = 0f
+
+        rot += deltaRot
         terrain.draw(modelMat)
 
         GUI {

@@ -35,6 +35,11 @@ object Window {
         initGL()
 
         glfwSetFramebufferSizeCallback(handle, ::onResize)
+        glfwSetKeyCallback(handle, ::onKey)
+//        winHandle.SetKeyCallback(keyCallback)
+//        winHandle.SetMouseButtonCallback(mouseButtonCallback)
+//        winHandle.SetCursorPosCallback(cursorPosCallback)
+//        winHandle.SetScrollCallback(scrollCallback)
         glfwSwapInterval(1)
 
         if(videoMode == VideoMode.WINDOWED_FULLSCREEN)
@@ -52,6 +57,9 @@ object Window {
     internal fun shouldClose(): Boolean = glfwWindowShouldClose(handle)
 
     internal fun update() {
+        keysPressed.clear()
+        keysReleased.clear()
+
         glfwSwapBuffers(handle)
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         glfwPollEvents()
@@ -67,6 +75,23 @@ object Window {
         UniformBuffers.set("data2D", glm.ortho(0f, width.toFloat(), height.toFloat(), 0f, 0f, 1f).toFloatArray())
         size = Pair(width, height)
     }
+    private fun onKey(win:Long, key:Int, code:Int, action:Int, modifiers:Int) {
+        if(action == 1) {
+            keysDown[key] = true
+            keysPressed[key] = true
+        }
+        else if(action == 0) {
+            keysDown[key] = false
+            keysReleased[key] = true
+        }
+    }
+
+    private var keysPressed = mutableMapOf<Int, Boolean>()
+    private var keysReleased = mutableMapOf<Int, Boolean>()
+    private var keysDown = mutableMapOf<Int, Boolean>()
+    fun keyDown(k:Int):Boolean = keysDown[k] ?: false
+    fun keyPressed(k:Int):Boolean = keysPressed[k] ?: false
+    fun keyReleased(k:Int):Boolean = keysReleased[k] ?: false
 }
 
 fun checkGLError() {
