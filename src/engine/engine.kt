@@ -13,8 +13,8 @@ object Engine {
         private set
 
     fun start(setupFn: ()->Unit, runFn: ()->Unit) {
-        Window.open()
         state = EngineState.SETUP
+        Window.open()
         setupFn()
         state = EngineState.RUNNING
         runFn()

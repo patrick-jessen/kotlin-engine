@@ -12,8 +12,6 @@ import org.patrick.game.engine.ui.Text
 fun main(args: Array<String>) = Engine.start(::setup, ::run)
 
 fun setup() {
-    UniformBuffers.add("data3D", 64)
-    UniformBuffers.add("data2D", 64)
     UniformBuffers.set("data2D", glm.ortho(0f, 800f, 600f, 0f, 0f, 1f).toFloatArray())
 
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)

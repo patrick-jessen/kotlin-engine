@@ -7,7 +7,6 @@ import glm_.vec4.Vec4
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL31.*
 import java.io.File
-import java.nio.IntBuffer
 
 object UniformBuffers {
     internal var ubos = mutableMapOf<String, UniformBuffer>()
