@@ -28,18 +28,19 @@ fun run() {
     )
 
     var rot = 0f
+    var lastMousePos = Vec2()
 
     Engine.render {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
 
         val modelMat = glm.eulerAngleY(rot)
-        var deltaRot = 0.01f * Engine.frameTime
-        if(Window.mouseButtonReleased(0))
-            deltaRot = -deltaRot
-        else if(!Window.mouseButtonReleased(1))
-            deltaRot = 0f
+        if(Window.mouseButtonPressed(0))
+            lastMousePos = Window.mousePos
+        if(Window.mouseButtonDown(0)) {
+            rot +=  0.01f * Engine.frameTime * (Window.mousePos - lastMousePos).x
+            lastMousePos = Window.mousePos
+        }
 
-        rot += deltaRot
         terrain.draw(modelMat)
 
         GUI {

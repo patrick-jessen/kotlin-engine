@@ -1,6 +1,7 @@
 package org.patrick.game.engine
 
 import glm_.glm
+import glm_.vec2.Vec2
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.*
@@ -37,7 +38,7 @@ object Window {
         glfwSetFramebufferSizeCallback(handle, ::onResize)
         glfwSetKeyCallback(handle, ::onKey)
         glfwSetMouseButtonCallback(handle, ::onMouseButton)
-//        winHandle.SetCursorPosCallback(cursorPosCallback)
+        glfwSetCursorPosCallback(handle, ::onMouseMove)
 //        winHandle.SetScrollCallback(scrollCallback)
         glfwSwapInterval(1)
 
@@ -96,6 +97,9 @@ object Window {
             mouseButtonsReleased[button] = true
         }
     }
+    private fun onMouseMove(win:Long, x:Double, y:Double) {
+        mousePos = Vec2(x.toFloat(), y.toFloat())
+    }
 
     private var keysPressed = mutableMapOf<Int, Boolean>()
     private var keysReleased = mutableMapOf<Int, Boolean>()
@@ -110,6 +114,9 @@ object Window {
     fun mouseButtonPressed(k:Int):Boolean = mouseButtonsPressed[k] ?: false
     fun mouseButtonReleased(k:Int):Boolean = mouseButtonsReleased[k] ?: false
     fun mouseButtonDown(k:Int):Boolean = mouseButtonsDown[k] ?: false
+
+    var mousePos:Vec2 = Vec2()
+        private set
 }
 
 fun checkGLError() {
