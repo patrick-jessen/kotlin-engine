@@ -39,6 +39,4 @@ object Engine {
     var frameTime = 1f
     var fps = 0f
         get() = 1000f/ frameTime
-
-    var test = 1f
 }

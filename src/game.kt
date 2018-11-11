@@ -2,6 +2,7 @@ package org.patrick.game
 
 import org.lwjgl.opengl.GL11.*
 import glm_.*
+import glm_.quat.Quat
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import glm_.vec4.Vec4
@@ -19,7 +20,7 @@ fun setup() {
 }
 
 fun run() {
-    val camera = Camera(glm.PIf / 3, Vec3(0, 50, 100))
+    val camera = Camera(glm.PIf / 3, Vec3(0, 0, 500))
     camera.activate()
 
     val terrain = Terrain(Asset.texture("terrain-height.png"), Asset.texture("terrain-diffuse.png"))
@@ -27,20 +28,23 @@ fun run() {
         slicePoints = Vec4(8,8,8,8)
     )
 
-    var rot = 0f
+    var rotX = 0f
+    var rotY = 0f
     var lastMousePos = Vec2()
 
     Engine.render {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
 
-        val modelMat = glm.eulerAngleY(rot)
-//        if(Window.mouseButtonPressed(0))
-//            lastMousePos = Window.mousePos
-//        if(Window.mouseButtonDown(0)) {
-//            rot +=  0.01f * Engine.frameTime * (Window.mousePos - lastMousePos).x
-//            lastMousePos = Window.mousePos
-//        }
-        rot += 0.01f * Engine.frameTime * Window.scroll
+        var rot = Quat.angleAxis(rotX, Vec3(1, 0,0))
+        rot = rot * Quat.angleAxis(rotY, Vec3(0, 1, 0))
+        val modelMat = rot.toMat4()
+        if(Window.mouseButtonPressed(0))
+            lastMousePos = Window.mousePos
+        if(Window.mouseButtonDown(0)) {
+            rotY +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).x
+            rotX +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).y
+            lastMousePos = Window.mousePos
+        }
 
         terrain.draw(modelMat)
 

@@ -122,6 +122,7 @@ object Window {
     var mousePos = Vec2()
         private set
     var scroll = 0f
+        private set
 }
 
 fun checkGLError() {

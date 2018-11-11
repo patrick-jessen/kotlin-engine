@@ -26,7 +26,7 @@ class Camera(
         }
 
     val viewMat: Mat4
-        get() = glm.translate(Mat4(), -pos) * rot.toMat4()
+        get() = rot.toMat4() *  glm.translate(Mat4(), -pos)
     val viewProjMat: Mat4
         get() = projMat * viewMat
 
