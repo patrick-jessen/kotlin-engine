@@ -39,7 +39,7 @@ object Window {
         glfwSetKeyCallback(handle, ::onKey)
         glfwSetMouseButtonCallback(handle, ::onMouseButton)
         glfwSetCursorPosCallback(handle, ::onMouseMove)
-//        winHandle.SetScrollCallback(scrollCallback)
+        glfwSetScrollCallback(handle, ::onScroll)
         glfwSwapInterval(1)
 
         if(videoMode == VideoMode.WINDOWED_FULLSCREEN)
@@ -61,6 +61,7 @@ object Window {
         keysReleased.clear()
         mouseButtonsPressed.clear()
         mouseButtonsReleased.clear()
+        scroll = 0f
 
         glfwSwapBuffers(handle)
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
@@ -100,6 +101,9 @@ object Window {
     private fun onMouseMove(win:Long, x:Double, y:Double) {
         mousePos = Vec2(x.toFloat(), y.toFloat())
     }
+    private fun onScroll(win:Long, x:Double, y:Double) {
+        scroll = y.toFloat()
+    }
 
     private var keysPressed = mutableMapOf<Int, Boolean>()
     private var keysReleased = mutableMapOf<Int, Boolean>()
@@ -115,8 +119,9 @@ object Window {
     fun mouseButtonReleased(k:Int):Boolean = mouseButtonsReleased[k] ?: false
     fun mouseButtonDown(k:Int):Boolean = mouseButtonsDown[k] ?: false
 
-    var mousePos:Vec2 = Vec2()
+    var mousePos = Vec2()
         private set
+    var scroll = 0f
 }
 
 fun checkGLError() {

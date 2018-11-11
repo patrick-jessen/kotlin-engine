@@ -34,12 +34,13 @@ fun run() {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
 
         val modelMat = glm.eulerAngleY(rot)
-        if(Window.mouseButtonPressed(0))
-            lastMousePos = Window.mousePos
-        if(Window.mouseButtonDown(0)) {
-            rot +=  0.01f * Engine.frameTime * (Window.mousePos - lastMousePos).x
-            lastMousePos = Window.mousePos
-        }
+//        if(Window.mouseButtonPressed(0))
+//            lastMousePos = Window.mousePos
+//        if(Window.mouseButtonDown(0)) {
+//            rot +=  0.01f * Engine.frameTime * (Window.mousePos - lastMousePos).x
+//            lastMousePos = Window.mousePos
+//        }
+        rot += 0.01f * Engine.frameTime * Window.scroll
 
         terrain.draw(modelMat)
 
