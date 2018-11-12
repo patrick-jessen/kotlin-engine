@@ -40,17 +40,22 @@ fun run() {
     )
     with(root) {
         add(Sprite(
-            minSize = UISize(10f, 10f),
-            size = UISize(120f, 25f),
+            minSize = UISize(40f, 10f),
+            size = UISize(40f, 25f),
             maxSize = UISize(200f, 100f),
             color = Vec4(1, 0, 0, 1)
         ))
         add(Sprite(
-            pos= Vec2(0, 25),
-            minSize = UISize(10f, 10f),
-            size = UISize(120f, 25f),
+            minSize = UISize(40f, 10f),
+            size = UISize(40f, 25f),
             maxSize = UISize(200f, 100f),
             color = Vec4(0, 1, 0, 1)
+        ))
+        add(Sprite(
+            minSize = UISize(150f, 10f),
+            size = UISize(150f, 25f),
+            maxSize = UISize(200f, 100f),
+            color = Vec4(0, 0, 1, 1)
         ))
     }
     root.calculateSizes()

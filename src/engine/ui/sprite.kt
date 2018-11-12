@@ -64,6 +64,7 @@ abstract class UIElement(
     private val maxSize:UISize
 ) {
     protected var size:UISize = prefSize
+    protected var pos:Vec2 = Vec2()
     private val children = mutableListOf<UIElement>()
 
     init {
@@ -75,22 +76,68 @@ abstract class UIElement(
 
     fun calculateSizes() {
         var width = size.width
+        val rowWidths = mutableListOf<Float>()
+
+        val rows = mutableListOf<MutableList<UIElement>>()
+        var currRow = mutableListOf<UIElement>()
+        rows.add(currRow)
+
 
         for(c in children) {
+            if(width-c.minSize.width < 0) {
+                if(c.minSize.width > size.width) {
+                    size.width = c.minSize.width
+                    calculateSizes()
+                    return
+                }
+
+                rowWidths.add(width)
+                width = size.width
+                currRow = mutableListOf()
+                rows.add(currRow)
+            }
+
             width -= c.minSize.width
             c.size = c.minSize
             c.size.height = c.prefSize.height
+
+            currRow.add(c)
+        }
+        rowWidths.add(width)
+
+        println("$rowWidths")
+
+        for((i, row) in rows.withIndex()) {
+            var w = rowWidths[i]
+
+            while (w > 0) {
+                var maxed = true
+                val dW = w / row.size
+
+                for (c in row) {
+                    val deltaPref = c.prefSize.width - c.minSize.width
+                    if (deltaPref < dW) {
+                        c.size.width = c.prefSize.width
+                        w -= deltaPref
+                    } else {
+                        maxed = false
+                        w -= dW
+                        c.size.width += dW
+                    }
+                }
+
+                if (maxed) break
+            }
         }
 
-        for(c in children) {
-            val deltaPref = c.prefSize.width - c.minSize.width
-            if(deltaPref > width) {
-                c.size.width = c.minSize.width + width
-                break
-            }
-            else {
-                width -= deltaPref
-                c.size.width = c.prefSize.width
+        for((ri,row) in rows.withIndex()) {
+            var x = 0f
+            for ((i, c) in row.withIndex()) {
+                println("Child$i: ${c.size}")
+
+                c.pos.x = x + rowWidths[ri]/2
+                c.pos.y = 25f*ri
+                x += c.size.width
             }
         }
     }
@@ -106,7 +153,6 @@ abstract class UIElement(
 }
 
 class Sprite(
-    private val pos:Vec2 = Vec2(),
     size:UISize = UISize(100f,100f),
     minSize:UISize = UISize(),
     maxSize:UISize = size,
