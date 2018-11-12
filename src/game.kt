@@ -34,29 +34,31 @@ fun run() {
 
     //UI ////////////////////////////////////////////////////////
     val root = Sprite(
-        minSize = UISize(100f, 100f),
         size = UISize(100f, 100f),
-        maxSize = UISize(100f, 100f)
+        maxSize = UISize(1000f,1000f)
     )
     with(root) {
         add(Sprite(
-            minSize = UISize(40f, 10f),
-            size = UISize(40f, 25f),
-            maxSize = UISize(200f, 100f),
+            size = UISize(0.4f, .25f),
             color = Vec4(1, 0, 0, 1)
         ))
         add(Sprite(
-            minSize = UISize(40f, 10f),
-            size = UISize(40f, 25f),
-            maxSize = UISize(200f, 100f),
-            color = Vec4(0, 1, 0, 1)
+            size = UISize(0.4f, .25f),
+            color = Vec4(1, 0, 0, 1)
         ))
         add(Sprite(
-            minSize = UISize(150f, 10f),
-            size = UISize(150f, 25f),
-            maxSize = UISize(200f, 100f),
-            color = Vec4(0, 0, 1, 1)
+            size = UISize(0.4f, .25f),
+            color = Vec4(1, 0, 0, 1)
         ))
+        add(Sprite(
+            size = UISize(0.4f, .25f),
+            color = Vec4(1, 0, 0, 1)
+        ))
+        add(Sprite(
+            size = UISize(0.4f, .25f),
+            color = Vec4(1, 0, 0, 1)
+        ))
+
     }
     root.calculateSizes()
     //////////////////////////////////////////////////////////

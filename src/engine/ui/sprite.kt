@@ -46,7 +46,7 @@ object QuadBuffer {
     }
 }
 
-class UISize(var width:Float = 0f, var height:Float = 0f) {
+data class UISize(var width:Float = 0f, var height:Float = 0f) {
     fun toVec2():Vec2 = Vec2(width, height)
     fun fitsWithin(other:UISize): Boolean {
         return width <= other.width && height <= other.height
@@ -67,78 +67,111 @@ abstract class UIElement(
     protected var pos:Vec2 = Vec2()
     private val children = mutableListOf<UIElement>()
 
-    init {
-        if(!prefSize.fitsWithin(maxSize))
-            throw Exception("prefSize may not be larger than maxSize")
-        if(!minSize.fitsWithin(prefSize))
-            throw Exception("prefSize may not be smaller than minSize")
-    }
 
     fun calculateSizes() {
-        var width = size.width
-        val rowWidths = mutableListOf<Float>()
+        val calcMinSize = minSize.copy()
 
-        val rows = mutableListOf<MutableList<UIElement>>()
-        var currRow = mutableListOf<UIElement>()
-        rows.add(currRow)
+        calc@ while(true) {
+            // Keeps track of EXTRA space
+            val rowSizes = mutableListOf<UISize>()
+            var currSize = calcMinSize.copy()
+            rowSizes.add(currSize)
+
+            val rows = mutableListOf<MutableList<UIElement>>()
+            var currRow = mutableListOf<UIElement>()
+            rows.add(currRow)
 
 
-        for(c in children) {
-            if(width-c.minSize.width < 0) {
-                if(c.minSize.width > size.width) {
-                    size.width = c.minSize.width
-                    calculateSizes()
-                    return
+            for(c in children) {
+                var cMinWidth = c.minSize.width
+                var cMinHeight = c.minSize.height
+
+                if(cMinWidth <= 1f) cMinWidth *= calcMinSize.width
+                if(cMinHeight <= 1f) cMinHeight *= calcMinSize.height
+
+                // Is there width enough for child on this row?
+                if(currSize.width - cMinWidth < 0) {
+
+                    // Child is wider than parent? - resize parent
+                    if(cMinWidth > calcMinSize.width) {
+                        calcMinSize.width = cMinWidth
+                        continue@calc // recalculate
+                    }
+
+                    // Make a new row
+                    currSize = calcMinSize.copy()
+                    rowSizes.add(currSize)
+                    currRow = mutableListOf()
+                    rows.add(currRow)
+                }
+                // Is the row tall enough for child?
+                if(currSize.height - cMinHeight < 0) {
+                    // Child is taller than parent? - resize parent
+                    if(cMinHeight > calcMinSize.height) {
+                        calcMinSize.height = cMinHeight
+                        continue@calc // recalculate
+                    }
+
+                    // Adjust row height
+                    currSize.height = cMinHeight
                 }
 
-                rowWidths.add(width)
-                width = size.width
-                currRow = mutableListOf()
-                rows.add(currRow)
+                // Set child to its minimum size
+                c.size.width = cMinWidth
+                c.size.height = cMinHeight
+
+                // Add child to row
+                currSize.width -= cMinWidth
+                currSize.height -= cMinHeight
+                currRow.add(c)
             }
 
-            width -= c.minSize.width
-            c.size = c.minSize
-            c.size.height = c.prefSize.height
+            // Resize children
+            for((i, row) in rows.withIndex()) {
+                val s = rowSizes[i]
 
-            currRow.add(c)
-        }
-        rowWidths.add(width)
+                while (s.width > 0) {
+                    var maxed = true
+                    val dW = s.width / row.size
 
-        println("$rowWidths")
+                    for (c in row) {
+                        val deltaPref = c.prefSize.width - c.minSize.width
+                        if (deltaPref < dW) {
+                            c.size.width = c.prefSize.width
+                            s.width -= deltaPref
+                        } else {
+                            maxed = false
+                            s.width -= dW
+                            c.size.width += dW
+                        }
+                    }
 
-        for((i, row) in rows.withIndex()) {
-            var w = rowWidths[i]
+                    if (maxed) break
+                }
+            }
 
-            while (w > 0) {
-                var maxed = true
-                val dW = w / row.size
+            // Position children
+            val rowHeight = size.height / rows.size
+            for((i,row) in rows.withIndex()) {
+                var x = 0f
 
                 for (c in row) {
-                    val deltaPref = c.prefSize.width - c.minSize.width
-                    if (deltaPref < dW) {
-                        c.size.width = c.prefSize.width
-                        w -= deltaPref
-                    } else {
-                        maxed = false
-                        w -= dW
-                        c.size.width += dW
-                    }
+                    c.pos.x = x + rowSizes[i].width/2
+                    c.pos.y = i * rowHeight + (rowHeight-c.size.height)/2
+                    x += c.size.width
+
+                    println("${c.size}")
                 }
-
-                if (maxed) break
+                println("H: ${rowSizes[i].height}")
             }
-        }
 
-        for((ri,row) in rows.withIndex()) {
-            var x = 0f
-            for ((i, c) in row.withIndex()) {
-                println("Child$i: ${c.size}")
 
-                c.pos.x = x + rowWidths[ri]/2
-                c.pos.y = 25f*ri
-                x += c.size.width
-            }
+            if(!calcMinSize.fitsWithin(maxSize))
+                println("WARNING: children do not fit within parent")
+            else
+                size = calcMinSize
+
+            break
         }
     }
 
@@ -153,9 +186,9 @@ abstract class UIElement(
 }
 
 class Sprite(
-    size:UISize = UISize(100f,100f),
-    minSize:UISize = UISize(),
-    maxSize:UISize = size,
+    size:UISize = UISize(1f,1f),
+    minSize:UISize = size,
+    maxSize:UISize = UISize(1f,1f),
     private val color:Vec4 = Vec4(1, 1, 1, 1),
     private val texture: Texture = Asset.texture("panel.png"),
     private val slicePoints: Vec4 = Vec4()
