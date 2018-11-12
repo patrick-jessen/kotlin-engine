@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL30.*
 import org.patrick.game.engine.*
 import org.patrick.game.engine.ui.Sprite
 import org.patrick.game.engine.ui.Text
+import org.patrick.game.engine.ui.UISize
 
 fun main(args: Array<String>) = Engine.start(::setup, ::run)
 
@@ -31,6 +32,30 @@ fun run() {
     var rotY = 0f
     var lastMousePos = Vec2()
 
+    //UI ////////////////////////////////////////////////////////
+    val root = Sprite(
+        minSize = UISize(100f, 100f),
+        size = UISize(100f, 100f),
+        maxSize = UISize(100f, 100f)
+    )
+    with(root) {
+        add(Sprite(
+            minSize = UISize(10f, 10f),
+            size = UISize(120f, 25f),
+            maxSize = UISize(200f, 100f),
+            color = Vec4(1, 0, 0, 1)
+        ))
+        add(Sprite(
+            pos= Vec2(0, 25),
+            minSize = UISize(10f, 10f),
+            size = UISize(120f, 25f),
+            maxSize = UISize(200f, 100f),
+            color = Vec4(0, 1, 0, 1)
+        ))
+    }
+    root.calculateSizes()
+    //////////////////////////////////////////////////////////
+
     Engine.render {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
 
@@ -45,13 +70,10 @@ fun run() {
             lastMousePos = Window.mousePos
         }
         currentCamera.pos.z -= Window.scroll * 2 * Engine.frameTime
-
-
         terrain.draw(modelMat)
 
-        GUI {
-            //Sprite(size = Vec2(65, 25), slicePoints = Vec4(8,8,8,8)).draw()
-//            Text("${Engine.fps.toInt()} fps", Vec2(5, 5)).draw()
+        GUI { root.render()
+            //Text("${Engine.fps.toInt()} fps", Vec2(5, 5)).draw()
         }
     }
 }

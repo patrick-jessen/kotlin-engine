@@ -5,6 +5,7 @@ import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import glm_.vec4.Vec4
 import org.lwjgl.BufferUtils
+import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL31.*
 import java.io.File
 
@@ -87,7 +88,8 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         glShaderSource(handle, src)
         glCompileShader(handle)
 
-        println(glGetShaderInfoLog(handle))
+        val log = glGetShaderInfoLog(handle)
+        if(log.isNotBlank()) println(log)
 
         val status = glGetShaderi(handle, GL_COMPILE_STATUS)
         if(status == GL_FALSE) throw Exception(glGetShaderInfoLog(handle))
@@ -103,7 +105,8 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         glAttachShader(handle, frag)
         glLinkProgram(handle)
 
-        println(glGetProgramInfoLog(handle))
+        val log = glGetProgramInfoLog(handle)
+        if(log.isNotBlank()) println(log)
 
         val status = glGetProgrami(handle, GL_LINK_STATUS)
         if(status == GL_FALSE) throw Exception(glGetProgramInfoLog(handle))
