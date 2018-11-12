@@ -66,6 +66,8 @@ object Window {
         glfwSwapBuffers(handle)
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         glfwPollEvents()
+
+        checkGLError("Uncaught OpenGL error")
     }
 
     internal fun close() {
@@ -125,14 +127,18 @@ object Window {
         private set
 }
 
-fun checkGLError() {
-    when(glGetError()) {
-        GL_INVALID_ENUM -> throw Exception("GL_INVALID_ENUM")
-        GL_INVALID_VALUE -> throw Exception("GL_INVALID_VALUE")
-        GL_INVALID_OPERATION -> throw Exception("GL_INVALID_OPERATION")
-        GL_STACK_OVERFLOW -> throw Exception("GL_STACK_OVERFLOW")
-        GL_STACK_UNDERFLOW -> throw Exception("GL_STACK_UNDERFLOW")
-        GL_OUT_OF_MEMORY -> throw Exception("GL_OUT_OF_MEMORY")
-        GL_INVALID_FRAMEBUFFER_OPERATION -> throw Exception("GL_INVALID_FRAMEBUFFER_OPERATION")
+fun checkGLError(msg:String="") {
+    var err = when(glGetError()) {
+        GL_INVALID_ENUM -> "GL_INVALID_ENUM"
+        GL_INVALID_VALUE -> "GL_INVALID_VALUE"
+        GL_INVALID_OPERATION -> "GL_INVALID_OPERATION"
+        GL_STACK_OVERFLOW -> "GL_STACK_OVERFLOW"
+        GL_STACK_UNDERFLOW -> "GL_STACK_UNDERFLOW"
+        GL_OUT_OF_MEMORY -> "GL_OUT_OF_MEMORY"
+        GL_INVALID_FRAMEBUFFER_OPERATION -> "GL_INVALID_FRAMEBUFFER_OPERATION"
+        0 -> return
+        else -> "UNKNOWN_ERROR"
     }
+    if(msg.isNotEmpty()) err += " - $msg"
+    throw Exception(err)
 }

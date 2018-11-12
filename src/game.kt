@@ -19,21 +19,13 @@ fun setup() {
 
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE)
-
-    TextureSettings.add("h.png",
-        internalFormat= GL_RGBA,
-        format = GL_RGBA,
-        type = GL_FLOAT,
-        minFilter = GL_NEAREST,
-        magFilter = GL_NEAREST
-    )
 }
 
 fun run() {
     val camera = Camera(glm.PIf / 3, Vec3(0, 0, 1000))
     camera.activate()
 
-    val terrain = Terrain(Asset.texture("h.png"), Asset.texture("terrain-diffuse.png"))
+    val terrain = Terrain(Asset.texture("terrain-height.png"), Asset.texture("terrain-diffuse.png"))
 
     var rotX = 0f
     var rotY = 0f
@@ -57,10 +49,10 @@ fun run() {
 
         terrain.draw(modelMat)
 
-//        GUI {
-//            Sprite(size = Vec2(65, 25), slicePoints = Vec4(8,8,8,8)).draw()
+        GUI {
+            //Sprite(size = Vec2(65, 25), slicePoints = Vec4(8,8,8,8)).draw()
 //            Text("${Engine.fps.toInt()} fps", Vec2(5, 5)).draw()
-//        }
+        }
     }
 }
 

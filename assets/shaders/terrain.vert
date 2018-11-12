@@ -1,8 +1,8 @@
 #version 330 core
 layout (location = 0) in vec2 vertPos;
 
-const int size = 512;
-const float heightScale = 1;
+const int size = 848;
+const float heightScale = 100;
 const int smoothFactor = 2;
 uniform mat4 modelMat;
 
@@ -26,10 +26,8 @@ vec2 getUV(vec2 coord) {
     return coord / size;
 }
 float getHeight(vec2 coord) {
-    //return texture(heightMap, getUV(coord)).r  * heightScale;
-    vec4 col= texture(heightMap, getUV(coord));
-    float h = col.r + col.g + col.b + col.a;
-    return h * 100;
+    float h = texture(heightMap, getUV(coord)).r;
+    return h * heightScale;
 }
 vec4 getPos(vec2 coord, float height) {
   return vec4(

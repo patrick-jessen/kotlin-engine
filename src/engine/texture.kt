@@ -51,9 +51,6 @@ class Texture internal constructor(file:String): Resource(file, ::Texture) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, settings.magFilter)
         glTexImage2D(GL_TEXTURE_2D, 0, settings.internalFormat, image.width, image.height, 0, settings.format,  settings.type, pixels)
         glBindTexture(GL_TEXTURE_2D, 0)
-
-        println("${image.width} x ${image.height}")
-        checkGLError()
     }
 
     fun bind(pos:Int) {

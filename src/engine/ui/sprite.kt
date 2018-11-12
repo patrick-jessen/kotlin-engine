@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL31.*
 import org.patrick.game.engine.Asset
 import org.patrick.game.engine.Shader
 import org.patrick.game.engine.Texture
+import org.patrick.game.engine.checkGLError
 
 object QuadBuffer {
     private var vao = 0

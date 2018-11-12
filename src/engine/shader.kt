@@ -53,7 +53,8 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         glUseProgram(handle)
         for((key, ubo) in UniformBuffers.ubos) {
             val ubi = glGetUniformBlockIndex(handle, key)
-            glUniformBlockBinding(handle, ubi, ubo.index)
+            if(ubi >= 0)
+                glUniformBlockBinding(handle, ubi, ubo.index)
         }
         glUseProgram(0)
     }
