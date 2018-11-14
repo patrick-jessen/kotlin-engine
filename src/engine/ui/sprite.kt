@@ -52,8 +52,24 @@ class UISize {
     private var fwidth = 0f
     private var fheight = 0f
 
-    val width = 0
-    val height = 0
+    var width:Int
+        set(value) {
+            if(relWidth) throw Exception("Width is relative")
+            fwidth = value.toFloat()
+        }
+        get() {
+            if(relWidth) throw Exception("Width is relative")
+            return fwidth.toInt()
+        }
+    var height:Int
+        set(value) {
+            if(relHeight) throw Exception("Height is relative")
+            fheight = value.toFloat()
+        }
+        get() {
+            if(relHeight) throw Exception("Height is relative")
+            return fheight.toInt()
+        }
 
     constructor()
     constructor(width:Int, height:Int) {
@@ -82,6 +98,10 @@ class UISize {
     fun fitsWithin(other:UISize): Boolean {
         return width <= other.width && height <= other.height
     }
+    fun fit(other:UISize) {
+        if(width < other.width) width = other.width
+        if(height < other.height) height = other.height
+    }
 
     fun toVec2():Vec2 = Vec2(width, height)
     fun toAbsolute(relativeTo:UISize): UISize {
@@ -100,8 +120,11 @@ class UISize {
         return new
     }
     operator fun plusAssign(other: UISize) {
-        width += other.width
-        height += other.height
+        fwidth += other.fwidth
+        fheight += other.fheight
+    }
+    operator fun minus(other: UISize):UISize {
+        return UISize(width - other.width, height - other.height)
     }
     override fun toString():String = "{$width,$height}"
 }
@@ -111,51 +134,85 @@ abstract class UIElement(
     private val minSize:UISize,
     private val maxSize:UISize
 ) {
+    private var parent:UIElement? = null
     protected var size:UISize = prefSize
     protected var pos:Vec2 = Vec2()
     private val children = mutableListOf<UIElement>()
 
     fun calculateSizesVertical() {
-        val parentSize = minSize.copy()
+        val parentSize = size
 
         calc@ while(true) {
-            val currSize = UISize()
+            val calcMinSize = UISize()
+            val calcPrefSize = UISize()
+            var finalSize = UISize()
 
             // Calculate minimum size needed to fit children
             for (c in children) {
-                val cMinSize = c.minSize.copy()
-
-                // Convert to absolute
-                if (cMinSize.width <= 1f) cMinSize.width *= parentSize.width
-                if (cMinSize.height <= 1f) cMinSize.height *= parentSize.height
-
-                currSize.width += cMinSize.width
-
-                // Is parent wide enough for children?
-                if (currSize.width < 0) {
-                    // Resize parent
-                    parentSize.width += -currSize.width
-                    continue@calc // recalculate
-                }
-                // Is parent tall enough for children?
-                if (currSize.height < cMinSize.height) {
-                    // Resize parent
-                    parentSize.height = cMinSize.height
-                    continue@calc // recalculate
-                }
+                val childMinSize = c.minSize.toAbsolute(parentSize)
+                val childPrefSize = c.prefSize.toAbsolute(parentSize)
+                calcMinSize.width += childMinSize.width
+                calcPrefSize.width += childPrefSize.width
+                if (childMinSize.height > calcMinSize.height)
+                    calcMinSize.height = childMinSize.height
+                if (childPrefSize.height > calcPrefSize.height)
+                    calcPrefSize.height = childPrefSize.height
 
                 // Set child to its preferred size
-                c.size.width = c.prefSize.width
-                c.size.height = c.prefSize.height
+                c.size = c.prefSize.toAbsolute(parentSize)
             }
-        }
 
+            finalSize = calcPrefSize
+
+            // Parent cannot fit children
+            if (!calcMinSize.fitsWithin(parentSize)) {
+                if (!calcMinSize.fitsWithin(maxSize))
+                    println("Warning: children do not fit in parent")
+                else {
+                    parentSize.fit(calcMinSize)
+                    continue@calc // recalculate
+                }
+            }
+
+            // Resize children
+            while(!finalSize.fitsWithin(parentSize)) {
+                var maxed = true
+                var dW = (finalSize.width - parentSize.width) / children.size
+                if(dW == 0) dW = 1
+
+                for (c in children) {
+                    val childMinSize = c.minSize.toAbsolute(parentSize)
+                    val childPrefSize = c.prefSize.toAbsolute(parentSize)
+
+                    val deltaPref = childPrefSize - childMinSize
+                    if (deltaPref.width < dW) {
+                        c.size.width = c.minSize.width
+                        finalSize.width -= deltaPref.width
+                    } else {
+                        maxed = false
+                        c.size.width -= dW
+                        finalSize.width -= dW
+                    }
+                }
+
+                if(maxed) break
+            }
+
+            // Position children
+            var x = 0f
+            for (c in children) {
+                c.pos.x = x
+                c.pos.y = (finalSize.height - c.size.height).toFloat() / 2
+                x += c.size.width
+            }
+            break@calc
+        }
     }
 
     fun calculateSizes() {
         calculateSizesVertical()
         return
-
+/*
         val calcMinSize = minSize.copy()
 
         calc@ while(true) {
@@ -258,7 +315,7 @@ abstract class UIElement(
                 size = calcMinSize
 
             break
-        }
+        }*/
     }
 
     fun add(el: UIElement):UIElement {
@@ -277,7 +334,7 @@ abstract class UIElement(
 class Sprite(
     size:UISize = UISize(1f,1f),
     minSize:UISize = size,
-    maxSize:UISize = UISize(1f,1f),
+    maxSize:UISize = size,
     private val color:Vec4 = Vec4(1, 1, 1, 1),
     private val texture: Texture = Asset.texture("panel.png"),
     private val slicePoints: Vec4 = Vec4()

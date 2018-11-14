@@ -36,18 +36,37 @@ fun run() {
 
     //UI ////////////////////////////////////////////////////////
     val root = Sprite(
-        size = UISize(100f, 100f),
-        maxSize = UISize(1000f,1000f)
+        size = UISize(100, 100),
+        maxSize = UISize(200, 200)
     )
     with(root) {
         add(Sprite(
-            minSize =  UISize(0f, .25f),
-            size = UISize(1f, .25f),
-            color = Vec4(1, 0, 0, 1)
+            texture = Asset.texture("questlog/close.png"),
+            size = UISize(24, 22)
+        ))
+        add(Sprite(
+            minSize = UISize(),
+            size = UISize(1f, 0)
         ))
         add(Sprite(
             texture = Asset.texture("questlog/close.png"),
-            size = UISize(24f, 22f)
+            size = UISize(24, 22)
+        ))
+        add(Sprite(
+            texture = Asset.texture("questlog/close.png"),
+            size = UISize(24, 22)
+        ))
+        add(Sprite(
+            texture = Asset.texture("questlog/close.png"),
+            size = UISize(24, 22)
+        ))
+        add(Sprite(
+            texture = Asset.texture("questlog/close.png"),
+            size = UISize(24, 22)
+        ))
+        add(Sprite(
+            texture = Asset.texture("questlog/close.png"),
+            size = UISize(24, 22)
         ))
 
     }
