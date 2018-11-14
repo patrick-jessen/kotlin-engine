@@ -46,10 +46,58 @@ object QuadBuffer {
     }
 }
 
-data class UISize(var width:Float = 0f, var height:Float = 0f) {
-    fun toVec2():Vec2 = Vec2(width, height)
+class UISize {
+    private var relWidth = false
+    private var relHeight = false
+    private var fwidth = 0f
+    private var fheight = 0f
+
+    val width = 0
+    val height = 0
+
+    constructor()
+    constructor(width:Int, height:Int) {
+        this.fwidth = width.toFloat()
+        this.fheight = height.toFloat()
+    }
+    constructor(width:Int, height:Float) {
+        relHeight = true
+        this.fwidth = width.toFloat()
+        this.fheight = height
+    }
+    constructor(width:Float, height:Int) {
+        relWidth = true
+        this.fwidth = width
+        this.fheight = height.toFloat()
+    }
+    constructor(width:Float, height:Float) {
+        relWidth = true
+        relHeight = true
+        this.fwidth = width
+        this.fheight = height
+    }
+
+    fun isAbsolute() = relWidth && relHeight
+
     fun fitsWithin(other:UISize): Boolean {
         return width <= other.width && height <= other.height
+    }
+
+    fun toVec2():Vec2 = Vec2(width, height)
+    fun toAbsolute(relativeTo:UISize): UISize {
+        var w = fwidth
+        var h = fheight
+        if(relWidth) w *= relativeTo.width
+        if(relHeight) h *= relativeTo.height
+        return UISize(w.toInt(), h.toInt())
+    }
+
+
+    fun copy():UISize {
+        val new = UISize(width, height)
+        new.relWidth = relWidth
+        new.relHeight = relHeight
+        return new
     }
     operator fun plusAssign(other: UISize) {
         width += other.width
@@ -67,8 +115,47 @@ abstract class UIElement(
     protected var pos:Vec2 = Vec2()
     private val children = mutableListOf<UIElement>()
 
+    fun calculateSizesVertical() {
+        val parentSize = minSize.copy()
+
+        calc@ while(true) {
+            val currSize = UISize()
+
+            // Calculate minimum size needed to fit children
+            for (c in children) {
+                val cMinSize = c.minSize.copy()
+
+                // Convert to absolute
+                if (cMinSize.width <= 1f) cMinSize.width *= parentSize.width
+                if (cMinSize.height <= 1f) cMinSize.height *= parentSize.height
+
+                currSize.width += cMinSize.width
+
+                // Is parent wide enough for children?
+                if (currSize.width < 0) {
+                    // Resize parent
+                    parentSize.width += -currSize.width
+                    continue@calc // recalculate
+                }
+                // Is parent tall enough for children?
+                if (currSize.height < cMinSize.height) {
+                    // Resize parent
+                    parentSize.height = cMinSize.height
+                    continue@calc // recalculate
+                }
+
+                // Set child to its preferred size
+                c.size.width = c.prefSize.width
+                c.size.height = c.prefSize.height
+            }
+        }
+
+    }
 
     fun calculateSizes() {
+        calculateSizesVertical()
+        return
+
         val calcMinSize = minSize.copy()
 
         calc@ while(true) {
@@ -83,11 +170,10 @@ abstract class UIElement(
 
 
             for(c in children) {
-                var cMinWidth = c.minSize.width
-                var cMinHeight = c.minSize.height
+                var cPrefSize = c.prefSize.copy()
 
-                if(cMinWidth <= 1f) cMinWidth *= calcMinSize.width
-                if(cMinHeight <= 1f) cMinHeight *= calcMinSize.height
+                if(cPrefSize.width <= 1f) cPrefSize.width *= calcMinSize.width
+                if(cPrefSize.height <= 1f) cPrefSize.height *= calcMinSize.height
 
                 // Is there width enough for child on this row?
                 if(currSize.width - cMinWidth < 0) {
@@ -175,7 +261,10 @@ abstract class UIElement(
         }
     }
 
-    fun add(el: UIElement) = children.add(el)
+    fun add(el: UIElement):UIElement {
+        children.add(el)
+        return el
+    }
 
     fun render() {
         draw()

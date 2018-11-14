@@ -20,6 +20,8 @@ fun setup() {
 
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE)
+
+    TextureSettings.add("questlog/close.png", format = GL_BGRA)
 }
 
 fun run() {
@@ -39,24 +41,13 @@ fun run() {
     )
     with(root) {
         add(Sprite(
-            size = UISize(0.4f, .25f),
+            minSize =  UISize(0f, .25f),
+            size = UISize(1f, .25f),
             color = Vec4(1, 0, 0, 1)
         ))
         add(Sprite(
-            size = UISize(0.4f, .25f),
-            color = Vec4(1, 0, 0, 1)
-        ))
-        add(Sprite(
-            size = UISize(0.4f, .25f),
-            color = Vec4(1, 0, 0, 1)
-        ))
-        add(Sprite(
-            size = UISize(0.4f, .25f),
-            color = Vec4(1, 0, 0, 1)
-        ))
-        add(Sprite(
-            size = UISize(0.4f, .25f),
-            color = Vec4(1, 0, 0, 1)
+            texture = Asset.texture("questlog/close.png"),
+            size = UISize(24f, 22f)
         ))
 
     }
