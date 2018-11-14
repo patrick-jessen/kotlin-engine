@@ -36,40 +36,32 @@ fun run() {
 
     //UI ////////////////////////////////////////////////////////
     val root = Sprite(
-        size = UISize(100, 100),
-        maxSize = UISize(200, 200)
+        size = UISize(10, 60),
+        maxSize = UISize(1f,1f),
+        slicePoints = Vec4(8,8,8,8)
     )
-    with(root) {
-        add(Sprite(
-            texture = Asset.texture("questlog/close.png"),
-            size = UISize(24, 22)
-        ))
-        add(Sprite(
-            minSize = UISize(),
-            size = UISize(1f, 0)
-        ))
-        add(Sprite(
-            texture = Asset.texture("questlog/close.png"),
-            size = UISize(24, 22)
-        ))
-        add(Sprite(
-            texture = Asset.texture("questlog/close.png"),
-            size = UISize(24, 22)
-        ))
-        add(Sprite(
-            texture = Asset.texture("questlog/close.png"),
-            size = UISize(24, 22)
-        ))
-        add(Sprite(
-            texture = Asset.texture("questlog/close.png"),
-            size = UISize(24, 22)
-        ))
-        add(Sprite(
-            texture = Asset.texture("questlog/close.png"),
-            size = UISize(24, 22)
-        ))
-
-    }
+    Sprite(
+        texture = Asset.texture("questlog/close.png"),
+        size = UISize(24, 22),
+        parent = root
+    )
+//    with(root) {
+////        val header = add(Sprite(
+////            minSize = UISize(),
+////            size = UISize(1f, 25)
+////        ))
+////        header.add(Text("Hello world"))
+////        add(Sprite(
+////            minSize = UISize(),
+////            size = UISize(1f, 0)
+////        ))
+//        add(Sprite(
+//            texture = Asset.texture("questlog/close.png"),
+//            size = UISize(24, 22)
+//        ))
+//
+//
+//    }
     root.calculateSizes()
     //////////////////////////////////////////////////////////
 

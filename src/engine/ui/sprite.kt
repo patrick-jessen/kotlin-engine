@@ -6,6 +6,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL31.*
 import org.patrick.game.engine.Asset
 import org.patrick.game.engine.Texture
+import org.patrick.game.engine.Window
 import java.lang.Exception
 
 object QuadBuffer {
@@ -132,66 +133,79 @@ class UISize {
 abstract class UIElement(
     private val prefSize:UISize,
     private val minSize:UISize,
-    private val maxSize:UISize
+    private val maxSize:UISize,
+    parent:UIElement? = null
 ) {
-    private var parent:UIElement? = null
-    protected var size:UISize = prefSize
-    protected var pos:Vec2 = Vec2()
+    private var parentSize = UISize()
+    protected var size = UISize()
+    protected var pos = Vec2()
     private val children = mutableListOf<UIElement>()
 
+    private var calcMinSize = UISize()
+    private var calcPrefSize = UISize()
+
+    init {
+        if(parent != null)
+            parent.children.add(this)
+
+        parentSize = when(parent == null) {
+            true -> UISize(Window.size.first, Window.size.second)
+            false -> parent.size
+        }
+        size = prefSize.toAbsolute(parentSize)
+    }
+
+
     fun calculateSizesVertical() {
-        val parentSize = size
+        calcMinSize = minSize.toAbsolute(minSize)
+        calcPrefSize = prefSize.toAbsolute(parentSize)
+        for(c in children) {
+            c.calculateSizesVertical()
+        }
 
         calc@ while(true) {
-            val calcMinSize = UISize()
-            val calcPrefSize = UISize()
-            var finalSize = UISize()
+            val newCalcMinSize = UISize()
+            val newCalcPrefSize = UISize()
 
             // Calculate minimum size needed to fit children
             for (c in children) {
-                val childMinSize = c.minSize.toAbsolute(parentSize)
-                val childPrefSize = c.prefSize.toAbsolute(parentSize)
-                calcMinSize.width += childMinSize.width
-                calcPrefSize.width += childPrefSize.width
-                if (childMinSize.height > calcMinSize.height)
-                    calcMinSize.height = childMinSize.height
-                if (childPrefSize.height > calcPrefSize.height)
-                    calcPrefSize.height = childPrefSize.height
+                newCalcMinSize.width += c.calcMinSize.width
+                newCalcPrefSize.width += c.calcPrefSize.width
+                if (c.calcMinSize.height > newCalcMinSize.height)
+                    newCalcMinSize.height = c.calcMinSize.height
+                if (c.calcPrefSize.height > newCalcPrefSize.height)
+                    newCalcPrefSize.height = c.calcPrefSize.height
 
                 // Set child to its preferred size
-                c.size = c.prefSize.toAbsolute(parentSize)
+                c.size = c.calcPrefSize
             }
 
-            finalSize = calcPrefSize
+            calcMinSize.fit(newCalcMinSize)
+            calcPrefSize.fit(calcMinSize)
 
             // Parent cannot fit children
-            if (!calcMinSize.fitsWithin(parentSize)) {
-                if (!calcMinSize.fitsWithin(maxSize))
-                    println("Warning: children do not fit in parent")
-                else {
-                    parentSize.fit(calcMinSize)
-                    continue@calc // recalculate
-                }
+            if(!calcMinSize.fitsWithin(maxSize.toAbsolute(parentSize))) {
+                println("Warning: children do not fit in parent")
             }
 
             // Resize children
-            while(!finalSize.fitsWithin(parentSize)) {
+            while(!newCalcPrefSize.fitsWithin(prefSize)) {
                 var maxed = true
-                var dW = (finalSize.width - parentSize.width) / children.size
+                var dW = (newCalcPrefSize.width - prefSize.width) / children.size
                 if(dW == 0) dW = 1
 
                 for (c in children) {
-                    val childMinSize = c.minSize.toAbsolute(parentSize)
-                    val childPrefSize = c.prefSize.toAbsolute(parentSize)
+                    val childMinSize = c.calcMinSize
+                    val childPrefSize = c.calcPrefSize
 
                     val deltaPref = childPrefSize - childMinSize
                     if (deltaPref.width < dW) {
                         c.size.width = c.minSize.width
-                        finalSize.width -= deltaPref.width
+                        newCalcPrefSize.width -= deltaPref.width
                     } else {
                         maxed = false
                         c.size.width -= dW
-                        finalSize.width -= dW
+                        newCalcPrefSize.width -= dW
                     }
                 }
 
@@ -202,13 +216,14 @@ abstract class UIElement(
             var x = 0f
             for (c in children) {
                 c.pos.x = x
-                c.pos.y = (finalSize.height - c.size.height).toFloat() / 2
+                c.pos.y = (newCalcPrefSize.height - c.size.height).toFloat() / 2
                 x += c.size.width
             }
             break@calc
         }
     }
 
+    // NOTE: This should be called on root
     fun calculateSizes() {
         calculateSizesVertical()
         return
@@ -318,11 +333,6 @@ abstract class UIElement(
         }*/
     }
 
-    fun add(el: UIElement):UIElement {
-        children.add(el)
-        return el
-    }
-
     fun render() {
         draw()
         for (c in children)
@@ -337,8 +347,9 @@ class Sprite(
     maxSize:UISize = size,
     private val color:Vec4 = Vec4(1, 1, 1, 1),
     private val texture: Texture = Asset.texture("panel.png"),
-    private val slicePoints: Vec4 = Vec4()
-): UIElement(size, minSize, maxSize)
+    private val slicePoints: Vec4 = Vec4(),
+    parent: UIElement? = null
+): UIElement(size, minSize, maxSize, parent)
 {
     private var shader = Asset.shader("sprite")
 
