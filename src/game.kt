@@ -40,11 +40,20 @@ fun run() {
         maxSize = UISize(1f,1f),
         slicePoints = Vec4(8,8,8,8)
     )
-    Sprite(
+    root.add(Sprite(
         texture = Asset.texture("questlog/close.png"),
-        size = UISize(24, 22),
-        parent = root
-    )
+        size = UISize(24, 22)
+    ))
+    root.add(Sprite(
+        minSize = UISize(),
+        size = UISize(0.5f, 1f),
+        color = Vec4(1,0,0,1)
+    ))
+
+
+
+
+
 //    with(root) {
 ////        val header = add(Sprite(
 ////            minSize = UISize(),
@@ -62,7 +71,7 @@ fun run() {
 //
 //
 //    }
-    root.calculateSizes()
+    root.calculateSizes(UISize(800,600), true)
     //////////////////////////////////////////////////////////
 
     Engine.render {
