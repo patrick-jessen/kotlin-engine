@@ -36,19 +36,35 @@ fun run() {
 
     //UI ////////////////////////////////////////////////////////
     val root = Sprite(
-        size = UISize(10, 60),
-        maxSize = UISize(1f,1f),
+        size = UISize(300, 60),
+        maxSize = UISize(800,600),
         slicePoints = Vec4(8,8,8,8)
     )
+
+    val test = root.add(Sprite(
+        minSize = UISize(),
+        size =  UISize(1f, 1f),
+        maxSize = UISize(1f, 1f),
+        color = Vec4(1,0,0,1),
+        slicePoints = Vec4(8,8,8,8)
+    ))
     root.add(Sprite(
         texture = Asset.texture("questlog/close.png"),
         size = UISize(24, 22)
     ))
-    root.add(Sprite(
+    test.add(Sprite(
         minSize = UISize(),
-        size = UISize(0.5f, 1f),
+        size = UISize(1f, 1f),
         color = Vec4(1,0,0,1)
     ))
+    test.add(Text("Quest Log"))
+    test.add(Sprite(
+        minSize = UISize(),
+        size = UISize(1f, 1f),
+        color = Vec4(1,0,0,1)
+    ))
+
+
 
 
 
@@ -71,7 +87,7 @@ fun run() {
 //
 //
 //    }
-    root.calculateSizes(UISize(800,600), true)
+    root.calculateSizes(UISize(800,600))
     //////////////////////////////////////////////////////////
 
     Engine.render {
