@@ -42,6 +42,16 @@ internal class UniformBuffer(bytes:Int) {
     }
 }
 
+object ShaderSettings {
+    internal var settings = mutableMapOf<String, ShaderSettingsObject>()
+    fun add(name:String, textures: Array<String>) {
+        if(Engine.state != EngineState.SETUP)
+            throw Exception("Shader settings must be set in SETUP state")
+        settings[name] = ShaderSettingsObject(textures)
+    }
+}
+internal class ShaderSettingsObject(val textures:Array<String> = arrayOf())
+
 class Shader internal constructor(file:String): Resource(file, ::Shader) {
     private var handle = 0
     private var uniforms = mutableMapOf<String, Int>()
@@ -57,6 +67,12 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
             if(ubi >= 0)
                 glUniformBlockBinding(handle, ubi, ubo.index)
         }
+
+        val settings = ShaderSettings.settings[file] ?: ShaderSettingsObject()
+        for((i, s) in settings.textures.withIndex()) {
+            set(s, i)
+        }
+
         glUseProgram(0)
     }
 

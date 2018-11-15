@@ -5,6 +5,7 @@ import glm_.vec2.Vec2
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.*
+import org.patrick.game.engine.ui.UI
 
 enum class VideoMode { WINDOWED, FULLSCREEN, WINDOWED_FULLSCREEN }
 
@@ -44,6 +45,8 @@ object Window {
 
         if(videoMode == VideoMode.WINDOWED_FULLSCREEN)
             glfwMaximizeWindow(handle)
+        else
+            onResize(0, size.first, size.second)
     }
 
     private fun initGL() {
@@ -79,6 +82,7 @@ object Window {
         glViewport(0, 0, width, height)
         UniformBuffers.set("data2D", glm.ortho(0f, width.toFloat(), height.toFloat(), 0f, 0f, 1f).toFloatArray())
         size = Pair(width, height)
+        UI.calculateSizes()
     }
     private fun onKey(win:Long, key:Int, code:Int, action:Int, modifiers:Int) {
         if(action == 1) {

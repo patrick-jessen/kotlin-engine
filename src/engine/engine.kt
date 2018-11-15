@@ -2,6 +2,7 @@ package org.patrick.game.engine
 
 import glm_.random
 import org.lwjgl.opengl.GL11.*
+import org.patrick.game.engine.ui.UI
 import java.util.*
 import kotlin.random.Random
 import kotlin.reflect.KFunction
@@ -24,10 +25,20 @@ object Engine {
         while(!Window.shouldClose()) {
             Window.update()
             renderFn()
+            renderUI()
             calcFrameTime()
         }
 
         Window.close()
+    }
+
+    private fun renderUI() {
+        glDisable(GL_DEPTH_TEST)
+        glEnable(GL_BLEND)
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        UI.root?.render()
+        glDisable(GL_BLEND)
+        glEnable(GL_DEPTH_TEST)
     }
 
     private fun calcFrameTime() {

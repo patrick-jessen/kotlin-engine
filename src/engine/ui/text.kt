@@ -1,6 +1,7 @@
 package org.patrick.game.engine.ui
 
 import glm_.func.common.ceil
+import glm_.vec2.Vec2
 import glm_.vec4.Vec4
 import org.patrick.game.engine.Asset
 import java.nio.IntBuffer
@@ -66,7 +67,7 @@ class Text(
         this.data = data.array()
     }
 
-    override fun draw() {
+    override fun draw(pos: Vec2) {
         shader.set("str", data)
         shader.set("color", color)
         shader.set("pos", pos)
