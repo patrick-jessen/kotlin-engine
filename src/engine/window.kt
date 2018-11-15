@@ -98,6 +98,8 @@ object Window {
         if(action == 1) {
             mouseButtonsDown[button] = true
             mouseButtonsPressed[button] = true
+
+            UI.onClick(mousePos)
         }
         else if(action == 0) {
             mouseButtonsDown[button] = false

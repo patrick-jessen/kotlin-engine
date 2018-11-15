@@ -53,10 +53,11 @@ fun run() {
         prefSize = UISize(28, 1f),
         sprite = panelSprite
     ))
-    closeContainer.add(UISprite(
+    val closeBtn = closeContainer.add(UISprite(
         prefSize = UISize(24, 22),
         sprite = Sprite(Asset.texture("questlog/close.png"))
     ))
+    closeBtn.onClick = {println("Close clicked")}
 
     UI.root = ui
     UI.calculateSizes()

@@ -18,6 +18,7 @@ open class UIElement(
     private val layout:UILayout = UILayout.HORIZONTAL,
     private val align:UIAlign = UIAlign.MIDDLE_CENTER
 ) {
+    private var absPos = Vec2()
     protected var size = UISize()
     private var pos = Vec2()
     private val children = mutableListOf<UIElement>()
@@ -90,7 +91,6 @@ open class UIElement(
                 if(done) break
             }
             for(c in children) {
-                println(c.size)
                 c.calculateSizes(c.size, size)
             }
 
@@ -134,10 +134,22 @@ open class UIElement(
         return child
     }
 
+    fun handleMouseClick(pos: Vec2) {
+        if(pos.x > absPos.x && pos.y > absPos.y &&
+           pos.x < (absPos.x + size.width) && pos.y < (absPos.y + size.height)) {
+            onClick?.invoke()
+            for(c in children) {
+                c.handleMouseClick(pos)
+            }
+        }
+    }
+
     fun render(parentPos:Vec2 = Vec2()) {
-        draw(parentPos + pos)
+        absPos = parentPos + pos
+        draw(absPos)
         for (c in children)
-            c.render(parentPos + pos)
+            c.render(absPos)
     }
     protected open fun draw(pos:Vec2) {}
+    var onClick:(()->Unit)? = null
 }
