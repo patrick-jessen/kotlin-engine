@@ -34,7 +34,7 @@ fun run() {
 
     val questLog = UISprite(
         prefSize = UISize(0.5f, 300),
-        align = UIAlign.TOP_CENTER,
+        align = UIAlign.TOP_LEFT,
         layout = UILayout.VERTICAL,
         sprite = panelSprite
     )
@@ -43,11 +43,11 @@ fun run() {
         prefSize = UISize(1f, 26),
         align = UIAlign.TOP_CENTER
     ))
-
     val headerTextPanel = header.add(UISprite(
         prefSize = UISize(1f, 1f),
         sprite = panelSprite
     ))
+    headerTextPanel.add(Text("Quest Log", color = Vec4(1,1,1,1)))
     val closeContainer = header.add(UISprite(
         prefSize = UISize(28, 1f),
         sprite = panelSprite
@@ -56,7 +56,13 @@ fun run() {
         prefSize = UISize(24, 22),
         sprite = Sprite(Asset.texture("questlog/close.png"))
     ))
-    headerTextPanel.add(Text("Quest Log", color = Vec4(1,1,1,1)))
+
+    questLog.add(UISprite(
+        prefSize = UISize(50, 50)
+    ))
+    questLog.add(UISprite(
+        prefSize = UISize(50, 50)
+    ))
 
     UI.root = questLog
     UI.calculateSizes()

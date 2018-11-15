@@ -61,16 +61,30 @@ open class UIElement(
 
                 for (c in children) {
                     val childSize = c.prefSize.toAbsolute(size)
-                    if (extraSpace.width > 0 && childSize.width > c.size.width) {
-                        extraSpace.width--
-                        calcMinSize.width++
-                        c.size.width++
-                        done = false
+
+                    if(layout == UILayout.HORIZONTAL) {
+                        if (extraSpace.width > 0 && childSize.width > c.size.width) {
+                            extraSpace.width--
+                            calcMinSize.width++
+                            c.size.width++
+                            done = false
+                        }
+                        if (size.height > c.size.height && childSize.height > c.size.height) {
+                            c.size.height++
+                            done = false
+                        }
                     }
-                    if (size.height > c.size.height && childSize.height > c.size.height) {
-                        extraSpace.height--
-                        c.size.height++
-                        done = false
+                    else if(layout == UILayout.VERTICAL) {
+                        if (size.width > c.size.width && childSize.width > c.size.width) {
+                            c.size.width++
+                            done = false
+                        }
+                        if (extraSpace.height > 0 && childSize.height > c.size.height) {
+                            extraSpace.height--
+                            calcMinSize.height++
+                            c.size.height++
+                            done = false
+                        }
                     }
                 }
                 if(done) break
@@ -82,19 +96,34 @@ open class UIElement(
 
             // Position children
             var x = 0f
+            var y = 0f
             for(c in children) {
-                c.pos.x = when(align.x) {
-                    1 -> (size.width - calcMinSize.width).toFloat()/2 + x
-                    2 -> (size.width - calcMinSize.width).toFloat() + x
-                    else -> x
+                if(layout == UILayout.HORIZONTAL) {
+                    c.pos.x = when (align.x) {
+                        1 -> (size.width - calcMinSize.width).toFloat() / 2 + x
+                        2 -> (size.width - calcMinSize.width).toFloat() + x
+                        else -> x
+                    }
+                    c.pos.y = when (align.y) {
+                        1 -> (size.height - c.size.height).toFloat() / 2
+                        2 -> (size.height - c.size.height).toFloat()
+                        else -> 0f
+                    }
+                    x += c.size.width
                 }
-                c.pos.y = when(align.y) {
-                    1 -> (size.height - c.size.height).toFloat()/2
-                    2 -> (size.height - c.size.height).toFloat()
-                    else -> 0f
+                else if(layout == UILayout.VERTICAL) {
+                    c.pos.x = when(align.x) {
+                        1 -> (size.width - c.size.width).toFloat() / 2
+                        2 -> (size.width - c.size.width).toFloat()
+                        else -> 0f
+                    }
+                    c.pos.y = when(align.y) {
+                        1 -> (size.height - calcMinSize.height).toFloat() / 2 + y
+                        2 -> (size.height - calcMinSize.height).toFloat() + y
+                        else -> y
+                    }
+                    y += c.size.height
                 }
-
-                x += c.size.width
             }
         }
     }
