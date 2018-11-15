@@ -30,36 +30,33 @@ fun run() {
     var lastMousePos = Vec2()
 
     //UI ///////////////////////////////////////////////////////
+    val panelSprite = Sprite(Asset.texture("questlog/panel.png"))
+
     val questLog = UISprite(
-        minSize = UISize(400, 0),
-        size = UISize(0.5f, 300),
-        maxSize = UISize(500,600),
+        prefSize = UISize(0.5f, 300),
         align = UIAlign.TOP_CENTER,
-        sprite = Sprite(
-            texture = Asset.texture("questlog/panel.png")
-        )
+        layout = UILayout.VERTICAL,
+        sprite = panelSprite
     )
 
-    val questLogHeader = questLog.add(UISprite(
-        minSize = UISize(),
-        size =  UISize(1f, 26),
-        sprite = Sprite(
-            texture = Asset.texture("questlog/panel.png")
-        )
+    val header = questLog.add(UIElement(
+        prefSize = UISize(1f, 26),
+        align = UIAlign.TOP_CENTER
     ))
-    val closeContainer = questLog.add(UISprite(
-        size = UISize(28, 26),
-        sprite = Sprite(
-            texture = Asset.texture("questlog/panel.png")
-        )
+
+    val headerTextPanel = header.add(UISprite(
+        prefSize = UISize(1f, 1f),
+        sprite = panelSprite
+    ))
+    val closeContainer = header.add(UISprite(
+        prefSize = UISize(28, 1f),
+        sprite = panelSprite
     ))
     closeContainer.add(UISprite(
-        size = UISize(24, 22),
-        sprite = Sprite(
-            texture = Asset.texture("questlog/close.png")
-        )
+        prefSize = UISize(24, 22),
+        sprite = Sprite(Asset.texture("questlog/close.png"))
     ))
-    questLogHeader.add(Text("Quest Log", color = Vec4(1,1,1,1)))
+    headerTextPanel.add(Text("Quest Log", color = Vec4(1,1,1,1)))
 
     UI.root = questLog
     UI.calculateSizes()

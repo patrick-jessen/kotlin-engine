@@ -13,8 +13,8 @@ enum class UIAlign(internal val x:Int, internal val y:Int) {
 
 open class UIElement(
     private val prefSize:UISize,
-    private val minSize:UISize,
-    private val maxSize:UISize,
+    private val minSize:UISize = prefSize,
+    private val maxSize:UISize = prefSize,
     private val layout:UILayout = UILayout.HORIZONTAL,
     private val align:UIAlign = UIAlign.MIDDLE_CENTER
 ) {
@@ -67,15 +67,16 @@ open class UIElement(
                         c.size.width++
                         done = false
                     }
-                    if (extraSpace.height > 0 && childSize.height > c.size.height) {
+                    if (size.height > c.size.height && childSize.height > c.size.height) {
                         extraSpace.height--
-                        calcMinSize.height++
                         c.size.height++
                         done = false
                     }
-                    c.calculateSizes(c.size)
                 }
                 if(done) break
+            }
+            for(c in children) {
+                c.calculateSizes(c.size)
             }
 
 

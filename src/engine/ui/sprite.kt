@@ -137,8 +137,8 @@ class UISize {
 }
 
 class Sprite(
-    private val color:Vec4 = Vec4(1, 1, 1, 1),
     private val texture: Texture = Asset.texture("panel.png"),
+    private val color:Vec4 = Vec4(1, 1, 1, 1),
     private val slicePoints: Vec4 = Vec4(8,8,8,8)
 ) {
     private val shader = Asset.shader("sprite")
@@ -159,13 +159,13 @@ class Sprite(
 }
 
 class UISprite(
-    size:UISize = UISize(1f,1f),
-    minSize:UISize = size,
-    maxSize:UISize = size,
+    prefSize:UISize = UISize(1f,1f),
+    minSize:UISize = prefSize,
+    maxSize:UISize = prefSize,
     layout: UILayout = UILayout.HORIZONTAL,
     align: UIAlign = UIAlign.MIDDLE_CENTER,
     val sprite:Sprite = Sprite()
-): UIElement(size, minSize, maxSize, layout, align)
+): UIElement(prefSize, minSize, maxSize, layout, align)
 {
     override fun draw(pos:Vec2) {
         sprite.draw(pos, size.toVec2())
