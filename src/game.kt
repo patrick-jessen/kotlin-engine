@@ -32,12 +32,13 @@ fun run() {
     //UI ///////////////////////////////////////////////////////
     val panelSprite = Sprite(Asset.texture("questlog/panel.png"))
 
-    val questLog = UISprite(
+    val ui = UIElement(align = UIAlign.MIDDLE_LEFT)
+    val questLog = ui.add(UISprite(
         prefSize = UISize(0.5f, 300),
         align = UIAlign.TOP_LEFT,
         layout = UILayout.VERTICAL,
         sprite = panelSprite
-    )
+    ))
 
     val header = questLog.add(UIElement(
         prefSize = UISize(1f, 26),
@@ -57,14 +58,7 @@ fun run() {
         sprite = Sprite(Asset.texture("questlog/close.png"))
     ))
 
-    questLog.add(UISprite(
-        prefSize = UISize(50, 50)
-    ))
-    questLog.add(UISprite(
-        prefSize = UISize(50, 50)
-    ))
-
-    UI.root = questLog
+    UI.root = ui
     UI.calculateSizes()
 
     //////////////////////////////////////////////////////////

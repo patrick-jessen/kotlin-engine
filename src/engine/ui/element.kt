@@ -12,7 +12,7 @@ enum class UIAlign(internal val x:Int, internal val y:Int) {
 }
 
 open class UIElement(
-    private val prefSize:UISize,
+    private val prefSize:UISize = UISize(1f,1f),
     private val minSize:UISize = prefSize,
     private val maxSize:UISize = prefSize,
     private val layout:UILayout = UILayout.HORIZONTAL,
@@ -36,11 +36,11 @@ open class UIElement(
         return size
     }
 
-    internal fun calculateSizes(avail:UISize) {
+    internal fun calculateSizes(avail:UISize, parentAvail:UISize) {
         val calcMinSize = calculateMinSize()
-        val absMinSize = minSize.toAbsolute(avail)
-        val absPrefSize = prefSize.toAbsolute(avail)
-        val absMaxSize = maxSize.toAbsolute(avail)
+        val absMinSize = minSize.toAbsolute(parentAvail)
+        val absPrefSize = prefSize.toAbsolute(parentAvail)
+        val absMaxSize = maxSize.toAbsolute(parentAvail)
 
         if(!calcMinSize.fitsWithin(avail) || !calcMinSize.fitsWithin(absMaxSize))
             println("Warning: children do not fit")
@@ -90,7 +90,8 @@ open class UIElement(
                 if(done) break
             }
             for(c in children) {
-                c.calculateSizes(c.size)
+                println(c.size)
+                c.calculateSizes(c.size, size)
             }
 
 
