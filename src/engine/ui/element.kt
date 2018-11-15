@@ -5,12 +5,18 @@ import glm_.vec2.Vec2
 enum class UILayout {
     VERTICAL, HORIZONTAL
 }
+enum class UIAlign(internal val x:Int, internal val y:Int) {
+    TOP_LEFT(0,0), TOP_CENTER(1,0), TOP_RIGHT(2,0),
+    MIDDLE_LEFT(0,1), MIDDLE_CENTER(1,1), MIDDLE_RIGHT(2, 1),
+    BOTTOM_LEFT(0, 2), BOTTOM_CENTER(1,2), BOTTOM_RIGHT(2,2)
+}
 
 open class UIElement(
     private val prefSize:UISize,
     private val minSize:UISize,
     private val maxSize:UISize,
-    private val layout:UILayout = UILayout.HORIZONTAL
+    private val layout:UILayout = UILayout.HORIZONTAL,
+    private val align:UIAlign = UIAlign.MIDDLE_CENTER
 ) {
     protected var size = UISize()
     private var pos = Vec2()
@@ -30,8 +36,9 @@ open class UIElement(
         return size
     }
 
-    fun calculateSizes(avail:UISize) {
+    internal fun calculateSizes(avail:UISize) {
         val calcMinSize = calculateMinSize()
+        val absMinSize = minSize.toAbsolute(avail)
         val absPrefSize = prefSize.toAbsolute(avail)
         val absMaxSize = maxSize.toAbsolute(avail)
 
@@ -41,6 +48,7 @@ open class UIElement(
         // Make this element fit within the available space
         size = absPrefSize
         size.fit(calcMinSize)
+        size.fit(absMinSize)
         size.fitWithin(absMaxSize)
         size.fitWithin(avail)
 
@@ -55,11 +63,13 @@ open class UIElement(
                     val childSize = c.prefSize.toAbsolute(size)
                     if (extraSpace.width > 0 && childSize.width > c.size.width) {
                         extraSpace.width--
+                        calcMinSize.width++
                         c.size.width++
                         done = false
                     }
                     if (extraSpace.height > 0 && childSize.height > c.size.height) {
                         extraSpace.height--
+                        calcMinSize.height++
                         c.size.height++
                         done = false
                     }
@@ -72,8 +82,17 @@ open class UIElement(
             // Position children
             var x = 0f
             for(c in children) {
-                c.pos.x = x
-                c.pos.y = (calcMinSize.height-c.size.height).toFloat()/2
+                c.pos.x = when(align.x) {
+                    1 -> (size.width - calcMinSize.width).toFloat()/2 + x
+                    2 -> (size.width - calcMinSize.width).toFloat() + x
+                    else -> x
+                }
+                c.pos.y = when(align.y) {
+                    1 -> (size.height - c.size.height).toFloat()/2
+                    2 -> (size.height - c.size.height).toFloat()
+                    else -> 0f
+                }
+
                 x += c.size.width
             }
         }

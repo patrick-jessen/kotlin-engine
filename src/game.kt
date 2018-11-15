@@ -1,12 +1,10 @@
 package org.patrick.game
 
-import org.lwjgl.opengl.GL11.*
 import glm_.*
 import glm_.quat.Quat
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import glm_.vec4.Vec4
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30.*
 import org.patrick.game.engine.*
 import org.patrick.game.engine.ui.*
@@ -32,34 +30,38 @@ fun run() {
     var lastMousePos = Vec2()
 
     //UI ///////////////////////////////////////////////////////
-    UI.root = UISprite(
-        size = UISize(0.5f, 60),
-        maxSize = UISize(500,600)
+    val questLog = UISprite(
+        minSize = UISize(400, 0),
+        size = UISize(0.5f, 300),
+        maxSize = UISize(500,600),
+        align = UIAlign.TOP_CENTER,
+        sprite = Sprite(
+            texture = Asset.texture("questlog/panel.png")
+        )
     )
 
-    val test = UI.root!!.add(UISprite(
+    val questLogHeader = questLog.add(UISprite(
         minSize = UISize(),
-        size =  UISize(1f, 10),
-        maxSize = UISize(1f, 1f),
-        sprite = Sprite(color=Vec4(1,0,0,1))
+        size =  UISize(1f, 26),
+        sprite = Sprite(
+            texture = Asset.texture("questlog/panel.png")
+        )
     ))
-    UI.root!!.add(UISprite(
+    val closeContainer = questLog.add(UISprite(
+        size = UISize(28, 26),
+        sprite = Sprite(
+            texture = Asset.texture("questlog/panel.png")
+        )
+    ))
+    closeContainer.add(UISprite(
         size = UISize(24, 22),
         sprite = Sprite(
             texture = Asset.texture("questlog/close.png")
         )
     ))
-    test.add(UISprite(
-        minSize = UISize(),
-        size = UISize(1f, 10),
-        sprite = Sprite(color=Vec4(1,0,0,1))
-    ))
-    test.add(Text("Quest Log"))
-    test.add(UISprite(
-        minSize = UISize(),
-        size = UISize(1f, 10),
-        sprite = Sprite(color=Vec4(1,0,0,1))
-    ))
+    questLogHeader.add(Text("Quest Log", color = Vec4(1,1,1,1)))
+
+    UI.root = questLog
     UI.calculateSizes()
 
     //////////////////////////////////////////////////////////

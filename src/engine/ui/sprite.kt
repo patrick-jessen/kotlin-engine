@@ -162,8 +162,10 @@ class UISprite(
     size:UISize = UISize(1f,1f),
     minSize:UISize = size,
     maxSize:UISize = size,
+    layout: UILayout = UILayout.HORIZONTAL,
+    align: UIAlign = UIAlign.MIDDLE_CENTER,
     val sprite:Sprite = Sprite()
-): UIElement(size, minSize, maxSize)
+): UIElement(size, minSize, maxSize, layout, align)
 {
     override fun draw(pos:Vec2) {
         sprite.draw(pos, size.toVec2())
