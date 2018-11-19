@@ -6,8 +6,9 @@ import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import glm_.vec4.Vec4
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL30.*
+import org.lwjgl.opengl.GL43.*
 import org.patrick.game.engine.*
+import org.patrick.game.engine.gl.GLCheckError
 import org.patrick.game.engine.ui.*
 
 fun main(args: Array<String>) = Engine.start(::setup, ::run)
@@ -16,10 +17,14 @@ fun setup() {
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
 
     ShaderSettings.add("sprite", arrayOf("tex"))
+
+    glPointSize(5f)
+    glPatchParameteri(GL_PATCH_VERTICES, 3)
+    GLCheckError()
 }
 
 fun run() {
-    val camera = Camera(glm.PIf / 3, Vec3(0, 0, 1000))
+    val camera = Camera(glm.PIf / 3, Vec3(0, 1, 4))
     camera.activate()
 
     val terrain = Terrain(Asset.texture("terrain/height.png"), Asset.texture("terrain/diffuse.png"))
@@ -58,7 +63,7 @@ fun run() {
     ))
     closeBtn.onClick = {println("Close clicked")}
 
-    UI.root = ui
+    //UI.root = ui
     UI.calculateSizes()
 
     //////////////////////////////////////////////////////////

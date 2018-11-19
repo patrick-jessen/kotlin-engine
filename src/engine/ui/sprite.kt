@@ -3,7 +3,9 @@ package org.patrick.game.engine.ui
 import glm_.vec2.Vec2
 import glm_.vec4.Vec4
 import org.lwjgl.BufferUtils
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL31.*
+import org.lwjgl.opengl.GL40.GL_PATCHES
 import org.patrick.game.engine.Asset
 import org.patrick.game.engine.Texture
 import java.lang.Exception
@@ -42,7 +44,8 @@ object QuadBuffer {
 
     fun draw(count:Int) {
         glBindVertexArray(vao)
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, count)
+        //glDrawArraysInstanced(GL_TRIANGLES, 0, 6, count)
+        glDrawArraysInstanced(GL_PATCHES, 0, 6, count)
     }
 }
 

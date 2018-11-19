@@ -7,6 +7,8 @@ import glm_.vec4.Vec4
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL31.*
+import org.lwjgl.opengl.GL40.GL_TESS_CONTROL_SHADER
+import org.lwjgl.opengl.GL40.GL_TESS_EVALUATION_SHADER
 import java.io.File
 
 object UniformBuffers {
@@ -57,9 +59,16 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
     private var uniforms = mutableMapOf<String, Int>()
 
     init {
-        val vert = File("./assets/shaders/$file/$file.vert").readText()
-        val frag = File("./assets/shaders/$file/$file.frag").readText()
-        createProgram(vert, frag)
+        val path = "./assets/shaders/$file/$file"
+        val vert = File("${path}_VS.glsl").readText()
+        val frag = File("${path}_FS.glsl").readText()
+        var tesc = ""
+        var tese = ""
+        try {
+            tesc = File("${path}_TCS.glsl").readText()
+            tese = File("${path}_TES.glsl").readText()
+        } catch (e:Exception) {}
+        createProgram(vert, frag, tesc, tese)
 
         glUseProgram(handle)
         for((key, ubo) in UniformBuffers.ubos) {
@@ -112,13 +121,21 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         return handle
     }
 
-    private fun createProgram(vertSrc:String, fragSrc:String) {
+    private fun createProgram(vertSrc:String, fragSrc:String, tessControl:String, tessEval:String) {
         val vert = compileShader(GL_VERTEX_SHADER, vertSrc)
         val frag = compileShader(GL_FRAGMENT_SHADER, fragSrc)
 
         handle = glCreateProgram()
         glAttachShader(handle, vert)
         glAttachShader(handle, frag)
+
+        if(tessControl.isNotBlank()) {
+            val tesc = compileShader(GL_TESS_CONTROL_SHADER, tessControl)
+            val tese = compileShader(GL_TESS_EVALUATION_SHADER, tessEval)
+            glAttachShader(handle, tesc)
+            glAttachShader(handle, tese)
+        }
+
         glLinkProgram(handle)
 
         val log = glGetProgramInfoLog(handle)

@@ -31,6 +31,7 @@ float getHeight(vec2 coord) {
     return h * heightScale;
 }
 vec4 getPos(vec2 coord, float height) {
+  return vec4(coord.x, 0, coord.y, 1);
   return vec4(
     coord.x - size/2,
     height,
