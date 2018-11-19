@@ -1,6 +1,5 @@
 package org.patrick.game.engine.gl
 
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL43.*
 
 class GLTexture {

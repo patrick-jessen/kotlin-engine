@@ -14,7 +14,6 @@ fun main(args: Array<String>) = Engine.start(::setup, ::run)
 
 fun setup() {
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f)
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE)
 
     ShaderSettings.add("sprite", arrayOf("tex"))
 }
@@ -23,7 +22,7 @@ fun run() {
     val camera = Camera(glm.PIf / 3, Vec3(0, 0, 1000))
     camera.activate()
 
-    val terrain = Terrain(Asset.texture("terrain/scape.png"), Asset.texture("terrain-diffuse.png"))
+    val terrain = Terrain(Asset.texture("terrain/height.png"), Asset.texture("terrain/diffuse.png"))
 
     var rotX = 0f
     var rotY = 0f
@@ -63,6 +62,7 @@ fun run() {
     UI.calculateSizes()
 
     //////////////////////////////////////////////////////////
+    var wireframe = false
 
     Engine.render {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
@@ -87,6 +87,12 @@ fun run() {
         }
         else if(Window.keyDown(67)) {
             Asset.shader("terrain").set("res", 2)
+        }
+
+        if(Window.keyReleased(87)) {
+            wireframe = !wireframe
+            if(wireframe) glPolygonMode( GL_FRONT_AND_BACK, GL_LINE)
+            else glPolygonMode( GL_FRONT_AND_BACK, GL_FILL)
         }
 
         terrain.draw(modelMat)

@@ -1,12 +1,10 @@
-#version 330 core
+#version 430 core
 layout (location = 0) in vec2 vertPos;
 
 const int size = 848;
 const float heightScale = 400;
 const int smoothFactor = 2;
 uniform mat4 modelMat;
-
-uniform int res;
 
 out vec3 fragNorm;
 out vec2 fragUV;
@@ -15,7 +13,7 @@ layout (std140) uniform data3D
 {
     mat4 viewProjMat;
 };
-uniform sampler2D heightMap;
+layout(binding=0) uniform sampler2D heightMap;
 
 vec2 getCoord(int quad) {
   float X = quad % size;
@@ -30,10 +28,6 @@ vec2 getUV(vec2 coord) {
 float getHeight(vec2 coord) {
     vec4 col = texture(heightMap, getUV(coord));
     float h = col.r;
-    if(res == 1)
-          h = col.g;
-    if(res == 2)
-        h = float(int(col.r*255) << 8 | int(col.g*255)) / 65535;
     return h * heightScale;
 }
 vec4 getPos(vec2 coord, float height) {

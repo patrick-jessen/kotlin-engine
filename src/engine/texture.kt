@@ -2,8 +2,6 @@ package org.patrick.game.engine
 
 import glm_.func.common.ceil
 import org.patrick.game.engine.gl.*
-import java.awt.image.DataBufferByte
-import java.awt.image.DataBufferInt
 import javax.imageio.ImageIO
 import java.io.File
 
@@ -14,7 +12,7 @@ class Texture internal constructor(file:String): Resource(file, ::Texture) {
         val data:IntArray
         val width:Int
         val height:Int
-        var format = GLTexture.Format.RGBA
+        val format:GLTexture.Format
 
         val extension = file.substring(file.lastIndexOf("."))
         when(extension) {

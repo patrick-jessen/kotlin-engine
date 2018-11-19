@@ -57,8 +57,8 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
     private var uniforms = mutableMapOf<String, Int>()
 
     init {
-        val vert = File("./assets/shaders/$file.vert").readText()
-        val frag = File("./assets/shaders/$file.frag").readText()
+        val vert = File("./assets/shaders/$file/$file.vert").readText()
+        val frag = File("./assets/shaders/$file/$file.frag").readText()
         createProgram(vert, frag)
 
         glUseProgram(handle)

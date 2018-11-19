@@ -2,7 +2,6 @@ package org.patrick.game.engine.gl
 
 import org.lwjgl.opengl.GL43.*
 
-
 fun GLCheckError(msg:String="") {
     var err = when(glGetError()) {
         GL_INVALID_ENUM -> "GL_INVALID_ENUM"
