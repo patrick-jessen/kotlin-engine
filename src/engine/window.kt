@@ -4,7 +4,8 @@ import glm_.glm
 import glm_.vec2.Vec2
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL30.*
+import org.lwjgl.opengl.GL43.*
+import org.patrick.game.engine.gl.GLCheckError
 import org.patrick.game.engine.ui.UI
 
 enum class VideoMode { WINDOWED, FULLSCREEN, WINDOWED_FULLSCREEN }
@@ -18,7 +19,7 @@ object Window {
     internal fun open() {
         if(!glfwInit()) throw Exception("Unable to initialize window")
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
@@ -70,7 +71,7 @@ object Window {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         glfwPollEvents()
 
-        checkGLError("Uncaught OpenGL error")
+        GLCheckError("Uncaught OpenGL error")
     }
 
     internal fun close() {
@@ -131,20 +132,4 @@ object Window {
         private set
     var scroll = 0f
         private set
-}
-
-fun checkGLError(msg:String="") {
-    var err = when(glGetError()) {
-        GL_INVALID_ENUM -> "GL_INVALID_ENUM"
-        GL_INVALID_VALUE -> "GL_INVALID_VALUE"
-        GL_INVALID_OPERATION -> "GL_INVALID_OPERATION"
-        GL_STACK_OVERFLOW -> "GL_STACK_OVERFLOW"
-        GL_STACK_UNDERFLOW -> "GL_STACK_UNDERFLOW"
-        GL_OUT_OF_MEMORY -> "GL_OUT_OF_MEMORY"
-        GL_INVALID_FRAMEBUFFER_OPERATION -> "GL_INVALID_FRAMEBUFFER_OPERATION"
-        0 -> return
-        else -> "UNKNOWN_ERROR"
-    }
-    if(msg.isNotEmpty()) err += " - $msg"
-    throw Exception(err)
 }

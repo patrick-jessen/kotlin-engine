@@ -2,9 +2,11 @@
 layout (location = 0) in vec2 vertPos;
 
 const int size = 848;
-const float heightScale = 100;
+const float heightScale = 400;
 const int smoothFactor = 2;
 uniform mat4 modelMat;
+
+uniform int res;
 
 out vec3 fragNorm;
 out vec2 fragUV;
@@ -26,7 +28,12 @@ vec2 getUV(vec2 coord) {
     return coord / size;
 }
 float getHeight(vec2 coord) {
-    float h = texture(heightMap, getUV(coord)).r;
+    vec4 col = texture(heightMap, getUV(coord));
+    float h = col.r;
+    if(res == 1)
+          h = col.g;
+    if(res == 2)
+        h = float(int(col.r*255) << 8 | int(col.g*255)) / 65535;
     return h * heightScale;
 }
 vec4 getPos(vec2 coord, float height) {

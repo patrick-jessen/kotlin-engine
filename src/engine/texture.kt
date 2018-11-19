@@ -1,62 +1,79 @@
 package org.patrick.game.engine
 
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL13.*
+import glm_.func.common.ceil
+import org.patrick.game.engine.gl.*
+import java.awt.image.DataBufferByte
+import java.awt.image.DataBufferInt
 import javax.imageio.ImageIO
 import java.io.File
-import java.nio.ByteBuffer
-
-object TextureSettings {
-    internal var settings = mutableMapOf<String, TextureSettingsObject>()
-    fun add(
-        name:String,
-        sWrap:Int     = GL_CLAMP_TO_EDGE,
-        tWrap:Int     = GL_CLAMP_TO_EDGE,
-        minFilter:Int = GL_LINEAR,
-        magFilter:Int = GL_LINEAR,
-        internalFormat:Int = GL_RGBA,
-        format:Int    = GL_RGBA,
-        type:Int      = GL_UNSIGNED_BYTE
-    ) {
-        if(Engine.state != EngineState.SETUP)
-            throw Exception("Texture settings must be set in SETUP state")
-        settings[name] = TextureSettingsObject(sWrap, tWrap, minFilter, magFilter, internalFormat, format, type)
-    }
-}
-internal class TextureSettingsObject(
-    val sWrap:Int     = GL_CLAMP_TO_EDGE,
-    val tWrap:Int     = GL_CLAMP_TO_EDGE,
-    val minFilter:Int = GL_LINEAR,
-    val magFilter:Int = GL_LINEAR,
-    val internalFormat:Int = GL_RGBA,
-    val format:Int    = GL_RGBA,
-    val type:Int      = GL_UNSIGNED_BYTE
-)
 
 class Texture internal constructor(file:String): Resource(file, ::Texture) {
-    private var handle = 0
+    private var tex = GLTexture()
 
     init {
-        val settings = TextureSettings.settings[file] ?: TextureSettingsObject()
+        val data:IntArray
+        val width:Int
+        val height:Int
+        var format = GLTexture.Format.RGBA
 
-        val image = ImageIO.read(File("./assets/textures/$file"))
-        val pixels = IntArray(image.width * image.height)
-        image.getRGB(0, 0, image.width, image.height, pixels, 0, image.width)
+        val extension = file.substring(file.lastIndexOf("."))
+        when(extension) {
+            ".png" -> {
+                val image = ImageIO.read(File("./assets/textures/$file"))
+                width = image.width
+                height = image.height
 
-        handle = glGenTextures()
-        glBindTexture(GL_TEXTURE_2D, handle)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, settings.sWrap)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, settings.tWrap)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, settings.minFilter)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, settings.magFilter)
-        glTexImage2D(GL_TEXTURE_2D, 0, settings.internalFormat, image.width, image.height, 0, settings.format,  settings.type, pixels)
-        glBindTexture(GL_TEXTURE_2D, 0)
+                // determine format
+                format = when(image.colorModel.numComponents) {
+                    1 -> GLTexture.Format.R16
+                    4 -> GLTexture.Format.RGBA
+                    else -> throw Exception("Unsupported color model: $file")
+                }
+
+                // allocate buffer
+                var bits = 0
+                for(comp in 0 until image.colorModel.numComponents)
+                    bits += image.colorModel.getComponentSize(comp)
+
+                val size = (width*height * (bits.toFloat()/Int.SIZE_BITS)).ceil.toInt()
+                data = IntArray(size)
+
+                // populate buffer
+                var i = 0
+                var byte = 0
+                val pixel = IntArray(4)
+                for(h in 0 until height) {
+                    for(w in 0 until width) {
+                        image.raster.getPixel(w, h, pixel)
+                        when(image.colorModel.numComponents) {
+                            1 -> {
+                                val lower = pixel[0] and 0xff
+                                val upper = (pixel[0] shr 8) and 0xff
+
+                                data[i] = data[i] or (lower shl (byte*8))
+                                byte++
+                                data[i] = data[i] or (upper shl (byte*8))
+                                byte++
+                                if(byte == 4) {
+                                    i++
+                                    byte = 0
+                                }
+                            }
+                            4 -> {
+                                data[i] = (pixel[0] shl 0) or (pixel[1] shl 8) or (pixel[2] shl 16) or (pixel[3] shl 24)
+                                i++
+                            }
+                        }
+                    }
+                }
+            }
+            else -> throw Exception("Texture file not supported: $file")
+        }
+
+        tex.upload(width, height, data, format)
+        GLCheckError("Failed to create texture: $file")
     }
 
-    fun bind(pos:Int) {
-        glActiveTexture(GL_TEXTURE0 + pos)
-        glBindTexture(GL_TEXTURE_2D, handle)
-    }
-
-    override fun destroy() = glDeleteTextures(handle)
+    fun bind(pos:Int) = tex.bind(pos)
+    override fun destroy() = tex.free()
 }

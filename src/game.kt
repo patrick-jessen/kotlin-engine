@@ -5,6 +5,7 @@ import glm_.quat.Quat
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import glm_.vec4.Vec4
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30.*
 import org.patrick.game.engine.*
 import org.patrick.game.engine.ui.*
@@ -16,14 +17,13 @@ fun setup() {
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE)
 
     ShaderSettings.add("sprite", arrayOf("tex"))
-    TextureSettings.add("questlog/close.png", format = GL_BGRA)
 }
 
 fun run() {
     val camera = Camera(glm.PIf / 3, Vec3(0, 0, 1000))
     camera.activate()
 
-    val terrain = Terrain(Asset.texture("terrain-height.png"), Asset.texture("terrain-diffuse.png"))
+    val terrain = Terrain(Asset.texture("terrain/scape.png"), Asset.texture("terrain-diffuse.png"))
 
     var rotX = 0f
     var rotY = 0f
@@ -34,7 +34,7 @@ fun run() {
 
     val ui = UIElement(align = UIAlign.MIDDLE_LEFT)
     val questLog = ui.add(UISprite(
-        prefSize = UISize(0.5f, 300),
+        prefSize = UISize(0.2f, 300),
         align = UIAlign.TOP_LEFT,
         layout = UILayout.VERTICAL,
         sprite = panelSprite
@@ -69,7 +69,7 @@ fun run() {
 
         var rot = Quat.angleAxis(rotX, Vec3(1, 0,0))
         rot = rot * Quat.angleAxis(rotY, Vec3(0, 1, 0))
-        val modelMat = rot.toMat4()
+        var modelMat = rot.toMat4()
         if(Window.mouseButtonPressed(0))
             lastMousePos = Window.mousePos
         if(Window.mouseButtonDown(0)) {
@@ -78,6 +78,17 @@ fun run() {
             lastMousePos = Window.mousePos
         }
         currentCamera.pos.z -= Window.scroll * 2 * Engine.frameTime
+
+        if(Window.keyDown(65)) {
+            Asset.shader("terrain").set("res", 0)
+        }
+        else if(Window.keyDown(66)) {
+            Asset.shader("terrain").set("res", 1)
+        }
+        else if(Window.keyDown(67)) {
+            Asset.shader("terrain").set("res", 2)
+        }
+
         terrain.draw(modelMat)
     }
 }
