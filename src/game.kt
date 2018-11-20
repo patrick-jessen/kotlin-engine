@@ -20,13 +20,13 @@ fun setup() {
 
     glPointSize(5f)
     glPatchParameteri(GL_PATCH_VERTICES, 3)
-    glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(2f, 2f, 2f, 2f))
-    glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(2f, 2f))
+    glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(1f, 1f, 1f, 1f))
+    glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(1f, 1f))
     GLCheckError()
 }
 
 fun run() {
-    val camera = Camera(glm.PIf / 3, Vec3(0, 1, 4))
+    val camera = Camera(glm.PIf / 3, Vec3(5, 0, 15))
     camera.activate()
 
     val terrain = Terrain(Asset.texture("terrain/height.png"), Asset.texture("terrain/diffuse.png"))
@@ -70,6 +70,7 @@ fun run() {
 
     //////////////////////////////////////////////////////////
     var wireframe = false
+    var tessLevel = 1f
 
     Engine.render {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
@@ -86,14 +87,15 @@ fun run() {
         }
         currentCamera.pos.z -= Window.scroll * 2 * Engine.frameTime
 
-        if(Window.keyDown(65)) {
-            Asset.shader("terrain").set("res", 0)
+        if(Window.keyReleased(65)) {
+            tessLevel++
+            glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
+            glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
         }
-        else if(Window.keyDown(66)) {
-            Asset.shader("terrain").set("res", 1)
-        }
-        else if(Window.keyDown(67)) {
-            Asset.shader("terrain").set("res", 2)
+        else if(Window.keyReleased(66)) {
+            tessLevel--
+            glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
+            glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
         }
 
         if(Window.keyReleased(87)) {

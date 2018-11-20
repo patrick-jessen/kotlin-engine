@@ -6,7 +6,29 @@ layout (std140) uniform data3D
     mat4 viewProjMat;
 };
 uniform mat4 modelMat;
+layout(binding=0) uniform sampler2D heightMap;
+
+out vec2 tesUV;
+
+
+int size = 5;
+
+vec2 getCoord(int quad) {
+  float X = quad % size;
+  float Y = quad / size;
+  X += vertPos.x;
+  Y += vertPos.y;
+  return vec2(X, Y);
+}
+
+vec2 getUV(vec2 coord) {
+    return coord / size;
+}
 
 void main() {
-    gl_Position = viewProjMat * modelMat * vec4(vertPos.x, 0, vertPos.y, 1);
+    vec2 coord = getCoord(gl_InstanceID);
+    vec2 UV = getUV(coord);
+
+    gl_Position = viewProjMat * modelMat * vec4(coord.x, 0, coord.y, 1);
+    tesUV = UV;
 }

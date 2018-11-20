@@ -65,11 +65,9 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         var tesc = ""
         var tese = ""
         if(File("${path}_TCS.glsl").exists()) {
-            println("TESC")
             tesc = File("${path}_TCS.glsl").readText()
         }
         if(File("${path}_TES.glsl").exists()) {
-            println("TESE")
             tese = File("${path}_TES.glsl").readText()
         }
 

@@ -44,7 +44,7 @@ object PatchMesh {
 
     fun draw() {
         glBindVertexArray(vao)
-        glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, 0)
+        glDrawElementsInstanced(GL_PATCHES, 6, GL_UNSIGNED_INT, 0, 5*5)
     }
 }
 
