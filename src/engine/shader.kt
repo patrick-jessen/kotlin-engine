@@ -64,10 +64,15 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
         val frag = File("${path}_FS.glsl").readText()
         var tesc = ""
         var tese = ""
-        try {
+        if(File("${path}_TCS.glsl").exists()) {
+            println("TESC")
             tesc = File("${path}_TCS.glsl").readText()
+        }
+        if(File("${path}_TES.glsl").exists()) {
+            println("TESE")
             tese = File("${path}_TES.glsl").readText()
-        } catch (e:Exception) {}
+        }
+
         createProgram(vert, frag, tesc, tese)
 
         glUseProgram(handle)
@@ -131,8 +136,10 @@ class Shader internal constructor(file:String): Resource(file, ::Shader) {
 
         if(tessControl.isNotBlank()) {
             val tesc = compileShader(GL_TESS_CONTROL_SHADER, tessControl)
-            val tese = compileShader(GL_TESS_EVALUATION_SHADER, tessEval)
             glAttachShader(handle, tesc)
+        }
+        if(tessEval.isNotBlank()) {
+            val tese = compileShader(GL_TESS_EVALUATION_SHADER, tessEval)
             glAttachShader(handle, tese)
         }
 

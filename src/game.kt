@@ -20,6 +20,8 @@ fun setup() {
 
     glPointSize(5f)
     glPatchParameteri(GL_PATCH_VERTICES, 3)
+    glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(2f, 2f, 2f, 2f))
+    glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(2f, 2f))
     GLCheckError()
 }
 
