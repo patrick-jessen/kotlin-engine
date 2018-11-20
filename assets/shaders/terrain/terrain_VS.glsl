@@ -20,7 +20,6 @@ vec2 getCoord(int quad) {
   Y += vertPos.y;
   return vec2(X, Y);
 }
-
 vec2 getUV(vec2 coord) {
     return coord / size;
 }
