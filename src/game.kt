@@ -1,6 +1,7 @@
 package org.patrick.game
 
 import glm_.*
+import glm_.mat4x4.Mat4
 import glm_.quat.Quat
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
@@ -10,6 +11,13 @@ import org.lwjgl.opengl.GL43.*
 import org.patrick.game.engine.*
 import org.patrick.game.engine.gl.GLCheckError
 import org.patrick.game.engine.ui.*
+
+const val keyCtrl = 341
+const val keyW = 87
+const val keyA = 65
+const val keyB = 66
+const val keyD = 68
+const val keyS = 83
 
 fun main(args: Array<String>) = Engine.start(::setup, ::run)
 
@@ -33,7 +41,7 @@ fun run() {
 
     var rotX = 0f
     var rotY = 0f
-    var lastMousePos = Vec2()
+    var lastMousePos = Window.mousePos
 
     //UI ///////////////////////////////////////////////////////
     val panelSprite = Sprite(Asset.texture("questlog/panel.png"))
@@ -75,35 +83,65 @@ fun run() {
     Engine.render {
         UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
 
-        var rot = Quat.angleAxis(rotX, Vec3(1, 0,0))
-        rot = rot * Quat.angleAxis(rotY, Vec3(0, 1, 0))
-        var modelMat = rot.toMat4()
+        if(Window.keyDown(keyCtrl)) {
+            if (Window.keyReleased(keyA)) {
+                tessLevel++
+                glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
+                glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
+            } else if (Window.keyReleased(keyB)) {
+                tessLevel--
+                glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
+                glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
+            }
+            if (Window.keyReleased(keyW)) {
+                wireframe = !wireframe
+                if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+                else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+            }
+        }
+        else {
+            var moveVec = Vec3()
+            if(Window.keyDown(keyW)) {
+                val v = glm.rotate(camera.rot, Vec3(0, 0, 1))
+                v.z = -v.z
+                moveVec = moveVec + v
+            }
+            if(Window.keyDown(keyS)) {
+                val v = glm.rotate(camera.rot, Vec3(0, 0, -1))
+                v.z = -v.z
+                moveVec = moveVec + v
+            }
+            if(Window.keyDown(keyA))
+                moveVec = moveVec + glm.rotate(camera.rot, Vec3(-1, 0, 0))
+            if(Window.keyDown(keyD))
+                moveVec = moveVec + glm.rotate(camera.rot, Vec3(1, 0, 0))
+
+            camera.pos = camera.pos + (moveVec * 0.1f)
+        }
         if(Window.mouseButtonPressed(0))
             lastMousePos = Window.mousePos
         if(Window.mouseButtonDown(0)) {
-            rotY +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).x
-            rotX +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).y
+            rotY += 0.0001f * Engine.frameTime * (Window.mousePos - lastMousePos).x
+            rotX += 0.0001f * Engine.frameTime * (Window.mousePos - lastMousePos).y
             lastMousePos = Window.mousePos
-        }
-        currentCamera.pos.z -= Window.scroll * 2 * Engine.frameTime
 
-        if(Window.keyReleased(65)) {
-            tessLevel++
-            glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
-            glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
-        }
-        else if(Window.keyReleased(66)) {
-            tessLevel--
-            glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
-            glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
+            val rot = Quat.angleAxis(rotX, Vec3(1, 0, 0))
+            camera.rot = rot * Quat.angleAxis(rotY, Vec3(0, 1, 0))
         }
 
-        if(Window.keyReleased(87)) {
-            wireframe = !wireframe
-            if(wireframe) glPolygonMode( GL_FRONT_AND_BACK, GL_LINE)
-            else glPolygonMode( GL_FRONT_AND_BACK, GL_FILL)
-        }
 
+//        var rot = Quat.angleAxis(rotX, Vec3(1, 0,0))
+//        rot = rot * Quat.angleAxis(rotY, Vec3(0, 1, 0))
+//        var modelMat = rot.toMat4()
+//        if(Window.mouseButtonPressed(0))
+//            lastMousePos = Window.mousePos
+//        if(Window.mouseButtonDown(0)) {
+//            rotY +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).x
+//            rotX +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).y
+//            lastMousePos = Window.mousePos
+//        }
+//        currentCamera.pos.z -= Window.scroll * 2 * Engine.frameTime
+        val modelMat = Mat4()
         terrain.draw(modelMat)
     }
 }
