@@ -30,12 +30,13 @@ fun setup() {
     glPatchParameteri(GL_PATCH_VERTICES, 3)
     glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(1f, 1f, 1f, 1f))
     glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(1f, 1f))
+    Asset.shader("terrain").set("tessLevel", 1f)
     GLCheckError()
 }
 
 fun run() {
-    val camera = Camera(glm.PIf / 3, Vec3(5, 0, 15))
-    camera.activate()
+    val camera = currentCamera as FPSCamera
+    camera.pos = Vec3(0, 5, 15)
 
     val terrain = Terrain(Asset.texture("terrain/height.png"), Asset.texture("terrain/diffuse.png"))
 
@@ -81,17 +82,21 @@ fun run() {
     var tessLevel = 1f
 
     Engine.render {
-        UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
+
 
         if(Window.keyDown(keyCtrl)) {
             if (Window.keyReleased(keyA)) {
                 tessLevel++
                 glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
                 glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
+                println("Tess: $tessLevel")
+                Asset.shader("terrain").set("tessLevel", tessLevel)
             } else if (Window.keyReleased(keyB)) {
                 tessLevel--
                 glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
                 glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
+                println("Tess: $tessLevel")
+                Asset.shader("terrain").set("tessLevel", tessLevel)
             }
             if (Window.keyReleased(keyW)) {
                 wireframe = !wireframe
@@ -100,48 +105,22 @@ fun run() {
             }
         }
         else {
-            var moveVec = Vec3()
-            if(Window.keyDown(keyW)) {
-                val v = glm.rotate(camera.rot, Vec3(0, 0, 1))
-                v.z = -v.z
-                moveVec = moveVec + v
-            }
-            if(Window.keyDown(keyS)) {
-                val v = glm.rotate(camera.rot, Vec3(0, 0, -1))
-                v.z = -v.z
-                moveVec = moveVec + v
-            }
-            if(Window.keyDown(keyA))
-                moveVec = moveVec + glm.rotate(camera.rot, Vec3(-1, 0, 0))
-            if(Window.keyDown(keyD))
-                moveVec = moveVec + glm.rotate(camera.rot, Vec3(1, 0, 0))
-
-            camera.pos = camera.pos + (moveVec * 0.1f)
+            var move = 0
+            var strafe = 0
+            if(Window.keyDown(keyW)) move += 1
+            if(Window.keyDown(keyS)) move -= 1
+            if(Window.keyDown(keyA)) strafe -= 1
+            if(Window.keyDown(keyD)) strafe += 1
+            camera.move(Vec2(move, strafe), 0.2f)
         }
-        if(Window.mouseButtonPressed(0))
+        if(Window.mouseButtonPressed(1))
             lastMousePos = Window.mousePos
-        if(Window.mouseButtonDown(0)) {
-            rotY += 0.0001f * Engine.frameTime * (Window.mousePos - lastMousePos).x
-            rotX += 0.0001f * Engine.frameTime * (Window.mousePos - lastMousePos).y
+        if(Window.mouseButtonDown(1)) {
+            camera.rotY += 0.0002f * Engine.frameTime * (Window.mousePos - lastMousePos).x
+            camera.rotX += 0.0002f * Engine.frameTime * (Window.mousePos - lastMousePos).y
             lastMousePos = Window.mousePos
-
-            val rot = Quat.angleAxis(rotX, Vec3(1, 0, 0))
-            camera.rot = rot * Quat.angleAxis(rotY, Vec3(0, 1, 0))
         }
 
-
-//        var rot = Quat.angleAxis(rotX, Vec3(1, 0,0))
-//        rot = rot * Quat.angleAxis(rotY, Vec3(0, 1, 0))
-//        var modelMat = rot.toMat4()
-//        if(Window.mouseButtonPressed(0))
-//            lastMousePos = Window.mousePos
-//        if(Window.mouseButtonDown(0)) {
-//            rotY +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).x
-//            rotX +=  0.001f * Engine.frameTime * (Window.mousePos - lastMousePos).y
-//            lastMousePos = Window.mousePos
-//        }
-//        currentCamera.pos.z -= Window.scroll * 2 * Engine.frameTime
-        val modelMat = Mat4()
-        terrain.draw(modelMat)
+        terrain.draw(Mat4())
     }
 }

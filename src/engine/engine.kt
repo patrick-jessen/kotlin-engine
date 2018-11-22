@@ -24,6 +24,8 @@ object Engine {
     fun render(renderFn: ()->Unit) {
         while(!Window.shouldClose()) {
             Window.update()
+
+            UniformBuffers.set("data3D", currentCamera.viewProjMat.toFloatArray())
             renderFn()
             renderUI()
             calcFrameTime()

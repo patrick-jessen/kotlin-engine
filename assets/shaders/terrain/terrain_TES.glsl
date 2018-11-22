@@ -4,11 +4,18 @@ layout (triangles) in;
 const float scaleFactor = 10;
 const float smoothFactor = 0.1;
 
-in vec2 tesUV[];
 out vec2 fragUV;
 out vec3 fragNorm;
 
+in TCSOut {
+    vec2 UV;
+} tesIn[];
+
 layout(binding=0) uniform sampler2D heightMap;
+layout (std140) uniform data3D
+{
+    mat4 viewProjMat;
+};
 uniform mat4 modelMat;
 
 float getHeight(vec2 coord) {
@@ -17,9 +24,9 @@ float getHeight(vec2 coord) {
 
 void main(void){
     fragUV = (
-        gl_TessCoord.x * tesUV[0] +
-        gl_TessCoord.y * tesUV[1] +
-        gl_TessCoord.z * tesUV[2]
+        gl_TessCoord.x * tesIn[0].UV +
+        gl_TessCoord.y * tesIn[1].UV +
+        gl_TessCoord.z * tesIn[2].UV
     );
 
     vec3 off = vec3(smoothFactor,smoothFactor, 0.0);
@@ -39,9 +46,8 @@ void main(void){
         gl_TessCoord.y * gl_in[1].gl_Position +
         gl_TessCoord.z * gl_in[2].gl_Position
     );
-    //fragNorm = mat3(modelMat) * normal;
-    fragNorm = normal;
-    //fragNorm = vec3(hL, hR, hD);
+    fragNorm = mat3(modelMat) * normal;
 
     gl_Position.y += getHeight(fragUV);
+    gl_Position = viewProjMat * modelMat * gl_Position;
 }
