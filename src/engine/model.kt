@@ -45,7 +45,7 @@ internal class Buffer(uri: String) : Resource("", ::Buffer) {
 
     override fun destroy() = glDeleteBuffers(handle)
 }
-internal class Mesh(gltf: GLTF, mp: GLTFMeshPrimitive) {
+private class Mesh(gltf: GLTF, mp: GLTFMeshPrimitive) {
     private var handle = 0
     private var vertBuffer:Buffer? = null
     private var normBuffer:Buffer? = null

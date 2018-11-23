@@ -9,7 +9,9 @@ class Mesh {
     private var numIndices = 0
     private var numVertices = 0
 
-    constructor(indices:IntArray? = null, vertices:FloatArray? = null) {
+    fun init(indices:IntArray? = null, vertices:FloatArray? = null) {
+        if(vao != 0) return
+
         vao = glGenVertexArrays()
         glBindVertexArray(vao)
 
@@ -40,5 +42,11 @@ class Mesh {
         }
         if(ibo == 0)glDrawArraysInstanced(modeGL, 0, numVertices, numInstances)
         else        glDrawElementsInstanced(modeGL, numIndices, GL_UNSIGNED_INT, 0, numInstances)
+    }
+
+    fun free() {
+        glDeleteBuffers(ibo)
+        glDeleteBuffers(vbo)
+        glDeleteVertexArrays(vao)
     }
 }
