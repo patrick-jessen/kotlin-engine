@@ -18,8 +18,8 @@ object UniformBuffers {
             throw Exception("Uniform buffers must be set in SETUP state")
         ubos[name] = UniformBuffer(bytes)
     }
-    fun set(name:String, data: FloatArray) {
-        ubos[name]!!.set(data)
+    fun set(name:String, data: FloatArray, offset:Long = 0L) {
+        ubos[name]!!.set(data, offset)
     }
 }
 
@@ -37,9 +37,9 @@ internal class UniformBuffer(bytes:Int) {
         glBindBuffer(GL_UNIFORM_BUFFER, 0)
     }
 
-    fun set(data:FloatArray) {
+    fun set(data:FloatArray, offset:Long = 0L) {
         glBindBuffer(GL_UNIFORM_BUFFER, handle)
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, data)
+        glBufferSubData(GL_UNIFORM_BUFFER, offset, data)
         glBindBuffer(GL_UNIFORM_BUFFER, 0)
     }
 }

@@ -19,6 +19,8 @@ const val keyB = 66
 const val keyD = 68
 const val keyS = 83
 
+var tessLevel = 5f
+
 fun main(args: Array<String>) = Engine.start(::setup, ::run)
 
 fun setup() {
@@ -28,9 +30,9 @@ fun setup() {
 
     glPointSize(5f)
     glPatchParameteri(GL_PATCH_VERTICES, 3)
-    glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(1f, 1f, 1f, 1f))
-    glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(1f, 1f))
-    Asset.shader("terrain").set("tessLevel", 1f)
+    glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, floatArrayOf(tessLevel, tessLevel, tessLevel, 1f))
+    glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, floatArrayOf(tessLevel, 1f))
+    Asset.shader("terrain").set("tessLevel", tessLevel)
     GLCheckError()
 }
 
@@ -79,10 +81,12 @@ fun run() {
 
     //////////////////////////////////////////////////////////
     var wireframe = false
-    var tessLevel = 1f
+
 
     Engine.render {
-
+        val tessPos = Vec3(camera.pos.x, 0, camera.pos.z)
+        UniformBuffers.set("data3D", tessPos.toFloatArray(), 64L)
+        println(tessPos)
 
         if(Window.keyDown(keyCtrl)) {
             if (Window.keyReleased(keyA)) {

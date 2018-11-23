@@ -51,7 +51,7 @@ object Window {
     }
 
     private fun initGL() {
-        UniformBuffers.add("data3D", 64)
+        UniformBuffers.add("data3D", 64+12)
         UniformBuffers.add("data2D", 64)
 
         glEnable(GL_CULL_FACE)

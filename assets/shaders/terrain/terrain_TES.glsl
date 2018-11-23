@@ -15,6 +15,7 @@ layout(binding=0) uniform sampler2D heightMap;
 layout (std140) uniform data3D
 {
     mat4 viewProjMat;
+    vec3 cameraPos;
 };
 uniform mat4 modelMat;
 
