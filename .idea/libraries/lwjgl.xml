@@ -1,21 +1,43 @@
 <component name="libraryTable">
   <library name="lwjgl">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl" />
-      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-opengl" />
-      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-glfw" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-natives-linux-arm32.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-natives-linux-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-natives-linux.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-natives-macos-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-natives-macos.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-natives-windows-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-natives-linux-arm32.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-natives-linux-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-natives-linux.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-natives-macos-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-natives-macos.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-natives-windows-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-natives-linux-arm32.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-natives-linux-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-natives-linux.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-natives-macos-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-natives-macos.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-natives-windows-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw.jar!/" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-javadoc.jar!/" />
+    </JAVADOC>
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl" />
-      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-opengl" />
-      <root url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-glfw" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl/lwjgl-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl/lwjgl-opengl-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl/lwjgl-glfw/lwjgl-glfw-sources.jar!/" />
     </SOURCES>
-    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl" recursive="false" />
-    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-glfw" recursive="false" />
-    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-opengl" recursive="false" />
-    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl" recursive="false" type="SOURCES" />
-    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-glfw" recursive="false" type="SOURCES" />
-    <jarDirectory url="file://$PROJECT_DIR$/../libs/lwjgl/lwjgl-opengl" recursive="false" type="SOURCES" />
   </library>
 </component>

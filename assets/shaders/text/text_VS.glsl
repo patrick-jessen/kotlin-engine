@@ -2,7 +2,7 @@
 layout (location = 0) in vec2 vertPos;
 
 const int numCharsInFont = 95;
-const float ratios[] = {
+const float ratios[] = float[](
   // symbols
   0.28,0.28,0.43,0.57,0.57,0.77,0.77,0.28,0.3,0.3,0.43,0.6,0.28,0.37,0.28,0.4,
   // numbers
@@ -17,7 +17,7 @@ const float ratios[] = {
   0.47,0.54,0.46,0.58,0.53,0.26,0.58,0.54,0.24,0.24,0.48,0.24,0.87,0.54,0.57,0.59,0.59,0.33,0.43,0.33,0.54,0.53,0.77,0.53,0.5,0.47,
   // symbols
   0.3,0.6,0.3,0.6
-};
+);
 
 uniform int size;
 uniform vec2 pos;

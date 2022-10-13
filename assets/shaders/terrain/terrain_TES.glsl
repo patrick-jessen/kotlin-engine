@@ -1,4 +1,4 @@
-#version 430 core
+#version 410 core
 layout (triangles) in;
 
 const float scaleFactor = 10;
@@ -11,7 +11,7 @@ in TCSOut {
     vec2 UV;
 } tesIn[];
 
-layout(binding=0) uniform sampler2D heightMap;
+uniform sampler2D heightMap;
 layout (std140) uniform data3D
 {
     mat4 viewProjMat;

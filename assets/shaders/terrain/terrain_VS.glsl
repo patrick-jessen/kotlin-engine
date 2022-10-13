@@ -1,8 +1,8 @@
-#version 430 core
+#version 410 core
 layout (location = 0) in vec2 vertPos;
 
 uniform mat4 modelMat;
-layout(binding=0) uniform sampler2D heightMap;
+uniform sampler2D heightMap;
 
 out VSOut {
     vec2 UV;
